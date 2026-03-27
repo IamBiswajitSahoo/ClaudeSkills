@@ -1,0 +1,10 @@
+{
+  "name": "bix",
+  "version": "1.0.0",
+  "description": "A collection of useful Claude Code skills for everyday productivity",
+  "author": {
+    "name": "Biswajit Sahoo"
+  },
+  "license": "MIT",
+  "keywords": ["utilities", "cleanup", "productivity", "maintenance"]
+}
