@@ -1,5 +1,7 @@
 # bix — Claude Skills Marketplace
 
+![bix](assets/Bix-Marketplace-Thumbnail-Edited.png)
+
 A collection of useful Claude Code skills, distributed as a plugin marketplace.
 
 ## Installation
