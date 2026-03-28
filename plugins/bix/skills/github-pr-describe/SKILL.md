@@ -1,6 +1,9 @@
 ---
 name: github-pr-describe
 description: Generate a well-structured PR description by analyzing the diff between the PR branch and its base branch, then push it to GitHub. Use when the user wants to describe a PR, generate a PR body, or write a PR summary.
+metadata:
+  author: Biswajit Sahoo (https://github.com/IamBiswajitSahoo)
+  license: Apache-2.0
 argument-hint: "<pr-number>"
 ---
 

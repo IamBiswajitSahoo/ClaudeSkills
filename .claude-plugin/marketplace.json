@@ -15,8 +15,8 @@
       "description": "A collection of useful Claude Code skills for everyday productivity",
       "version": "1.0.0",
       "category": "utilities",
-      "tags": ["cleanup", "disk-space", "maintenance", "productivity", "github", "pull-request", "pr-description", "code-review"],
-      "license": "MIT"
+      "tags": ["cleanup", "disk-space", "maintenance", "productivity", "github", "pull-request", "pr-description", "pr-review", "pr-resolve", "code-review"],
+      "license": "Apache-2.0"
     }
   ]
 }

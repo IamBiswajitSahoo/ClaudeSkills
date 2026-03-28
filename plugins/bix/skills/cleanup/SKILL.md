@@ -1,6 +1,9 @@
 ---
 name: cleanup
 description: Scan and clean up Claude Code's internal data (~/.claude/) to reclaim disk space. Use when the user wants to free up space, check Claude Code disk usage, or clean stale sessions/caches.
+metadata:
+  author: Biswajit Sahoo (https://github.com/IamBiswajitSahoo)
+  license: Apache-2.0
 disable-model-invocation: true
 argument-hint: "[-all]"
 ---

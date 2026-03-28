@@ -17,6 +17,7 @@ Once installed, all skills are available under the `/bix:` prefix.
 
 ### GitHub
 
+- **`/bix:github-pr-review`** — Review a PR with severity-labeled findings, parallel agent support, and per-comment approval. [Full documentation →](docs/github-pr-review/README.md)
 - **`/bix:github-pr-describe`** — Generate a well-structured PR description by analyzing the diff, then push it to GitHub. [Full documentation →](docs/github-pr-describe/README.md)
 - **`/bix:github-pr-resolve`** — Evaluate and triage review comments on a PR, then implement agreed fixes. [Full documentation →](docs/github-pr-resolve/README.md)
 
@@ -26,7 +27,7 @@ Once installed, all skills are available under the `/bix:` prefix.
 
 ## License
 
-MIT
+Apache 2.0 — see [LICENSE](LICENSE)
 
 ---
 

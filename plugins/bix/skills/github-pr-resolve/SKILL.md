@@ -1,6 +1,9 @@
 ---
 name: github-pr-resolve
 description: Evaluate and triage existing review comments on a GitHub pull request, then implement agreed fixes. Use when the user wants to address PR feedback, resolve review comments, or fix reviewer requests.
+metadata:
+  author: Biswajit Sahoo (https://github.com/IamBiswajitSahoo)
+  license: Apache-2.0
 argument-hint: "<pr-number>"
 ---
 
