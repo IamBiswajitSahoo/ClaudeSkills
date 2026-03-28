@@ -15,6 +15,13 @@ Once installed, all skills are available under the `/bix:` prefix.
 
 ## Available Skills
 
+### GitHub
+
+- **`/bix:github-pr-describe`** — Generate a well-structured PR description by analyzing the diff, then push it to GitHub. [Full documentation →](docs/github-pr-describe/README.md)
+- **`/bix:github-pr-resolve`** — Evaluate and triage review comments on a PR, then implement agreed fixes. [Full documentation →](docs/github-pr-resolve/README.md)
+
+### Utilities
+
 - **`/bix:cleanup`** — Scan and clean up Claude Code's internal data (`~/.claude/`) to reclaim disk space. [Full documentation →](docs/cleanup/README.md)
 
 ## License
