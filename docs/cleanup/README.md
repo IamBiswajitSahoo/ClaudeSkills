@@ -1,4 +1,6 @@
-# /bix:cleanup
+# /cleanup
+
+> Also available as `/cleanup`
 
 Scan and clean up Claude Code's internal data (`~/.claude/`) to reclaim disk space.
 
@@ -15,8 +17,8 @@ First, add the marketplace and install the `bix` plugin:
 
 | Command | Behavior |
 |---------|----------|
-| `/bix:cleanup` | Scans `~/.claude/`, shows size table, lets you pick which directories to clean |
-| `/bix:cleanup -all` | Auto-selects all safe-to-delete directories, asks for confirmation |
+| `/cleanup` | Scans `~/.claude/`, shows size table, lets you pick which directories to clean |
+| `/cleanup -all` | Auto-selects all safe-to-delete directories, asks for confirmation |
 
 ## Features
 
