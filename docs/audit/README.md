@@ -1,0 +1,173 @@
+# /bix:audit
+
+Security audit for Claude Code extension surfaces — skills, MCP servers, hooks, and CLAUDE.md files. Runs a fast regex-based pattern scan first, then spawns parallel deep-analysis agents for semantic review.
+
+## Installation
+
+First, add the marketplace and install the `bix` plugin:
+
+```bash
+/plugin marketplace add IamBiswajitSahoo/ClaudeSkills
+/plugin install bix@Biswajit-Claude-Skills
+```
+
+## Usage
+
+| Command                              | Behavior                                    |
+| ------------------------------------ | ------------------------------------------- |
+| `/bix:audit skill ./path/to/skill`   | Audit a skill directory before installing    |
+| `/bix:audit mcp`                     | Audit all configured MCP servers             |
+| `/bix:audit mcp my-server`           | Audit a specific MCP server                  |
+| `/bix:audit hooks`                   | Audit hooks in settings.json                 |
+| `/bix:audit claudemd`                | Audit CLAUDE.md files for prompt injection   |
+| `/bix:audit all`                     | Run all audits on current environment        |
+| `/bix:audit`                         | Interactive mode — prompts for what to audit |
+
+## Architecture
+
+The skill uses a **progressive disclosure** design to minimize token usage and give the user control over depth:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│ Phase 1: Parse & Route                                  │
+│   Parse mode (skill / mcp / hooks / claudemd / all)     │
+│   Validate target path or config existence              │
+└──────────────────────────┬──────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│ Phase 2: Quick Scan (fast, no LLM tokens)               │
+│   Python scripts run regex patterns → instant results   │
+│   Display risk score + top findings                     │
+└──────────────────────────┬──────────────────────────────┘
+                           ▼
+                   ┌───────────────┐
+                   │ User decides  │
+                   │ Deep scan?    │
+                   │ Show details? │
+                   │ Done?         │
+                   └───────┬───────┘
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│ Phase 3: Deep Analysis (parallel sub-agents)            │
+│                                                         │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌───────────┐   │
+│  │  Skill   │ │   MCP    │ │  Hooks   │ │ CLAUDE.md │   │
+│  │  Agent   │ │  Agent   │ │  Agent   │ │   Agent   │   │
+│  │ (sonnet) │ │ (sonnet) │ │ (sonnet) │ │  (sonnet) │   │
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └─────┬─────┘   │
+│       └─────────────┴───────────┴──────────────┘        │
+│                         ▼                               │
+│              Merge & deduplicate findings               │
+└──────────────────────────┬──────────────────────────────┘
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│ Phase 4: Report                                         │
+│   Combined risk score, findings by severity,            │
+│   clean items, prioritized recommendations              │
+└─────────────────────────────────────────────────────────┘
+```
+
+## Token Efficiency
+
+The skill is designed to be cost-effective even for large audit targets:
+
+- **Quick scan uses zero LLM tokens** — Python scripts run regex pattern matching locally, giving instant results without invoking the model
+- **Deep analysis is opt-in** — the user sees quick results first and decides whether to go deeper, avoiding unnecessary token spend on clean targets
+- **Sub-agents use Sonnet** — deep analysis agents run on the `sonnet` model for faster, cheaper inference
+- **Focused agent context** — each sub-agent receives only the data relevant to its surface (skill files, MCP configs, hooks, or CLAUDE.md), not the entire audit context
+- **Parallel execution** — in `all` mode, up to 4 agents run simultaneously rather than sequentially, reducing wall-clock time
+- **Early termination** — if the quick scan verdict is SAFE, the user can stop without spawning any agents
+
+## Features
+
+- **Two-phase architecture** — fast pattern scan (seconds) then optional deep analysis (parallel agents)
+- **Progressive disclosure** — see quick results immediately, drill into deep analysis only if needed
+- **4 audit surfaces** in one tool:
+
+  - **Skills** — prompt injection, credential theft, malicious payloads, obfuscation, supply chain
+  - **MCP servers** — server identity, command analysis, env var exposure, permission scope
+  - **Hooks** — command safety, trigger scope, data flow, global vs. project scope
+  - **CLAUDE.md** — instruction hijacking, hidden instructions, data exfiltration setup
+
+- **Risk scoring** — 0-100 scale with verdicts: SAFE, CAUTION, SUSPICIOUS, DANGEROUS, MALICIOUS
+- **Parallel sub-agents** — deep analysis runs as focused agents in parallel to save time and tokens
+- **39 detection patterns** — covering prompt injection, credential theft, reverse shells, obfuscation, supply chain attacks, and more
+
+## Audit Modes
+
+### Skill Audit (`/bix:audit skill <path>`)
+
+Audits a skill directory before installation. Checks:
+
+- SKILL.md for prompt injection and hidden instructions
+- Script files for malicious payloads and obfuscated code
+- File inventory for unexpected binaries or executables
+- Frontmatter for overly permissive tool access
+- URLs and env var references for data exfiltration
+
+### MCP Server Audit (`/bix:audit mcp`)
+
+Audits configured MCP server definitions. Checks:
+
+- Server identity and package trust (typosquatting, unknown publishers)
+- Command and argument analysis (suspicious flags, inline scripts)
+- Environment variables passed to servers (hardcoded secrets, unnecessary exposure)
+- Permission scope (overly broad filesystem/API access)
+- Tool description injection vectors
+
+### Hooks Audit (`/bix:audit hooks`)
+
+Audits Claude Code hooks in settings.json. Checks:
+
+- Command safety (network calls, file modifications, eval usage)
+- Trigger scope (wildcard matchers, high-frequency events)
+- Data flow (can the hook capture and exfiltrate tool I/O?)
+- Scope risk (global hooks have higher blast radius than project hooks)
+
+### CLAUDE.md Audit (`/bix:audit claudemd`)
+
+Audits CLAUDE.md files for prompt injection. Checks:
+
+- Instruction hijacking (disabling confirmations, skipping security checks)
+- Hidden instructions (HTML comments, Unicode tricks, formatting exploits)
+- Data exfiltration setup (instructions to embed secrets in outputs)
+- Tool behavior overrides (changing how Claude uses specific tools)
+
+## Risk Score
+
+| Score | Verdict    | Meaning                                                  |
+| ----- | ---------- | -------------------------------------------------------- |
+| 0-20  | SAFE       | No significant security concerns                         |
+| 21-40 | CAUTION    | Minor concerns, proceed with awareness                   |
+| 41-60 | SUSPICIOUS | Multiple red flags, manual review recommended            |
+| 61-80 | DANGEROUS  | Serious concerns, do NOT use without expert review       |
+| 81-100| MALICIOUS  | Strong indicators of malicious intent, AVOID             |
+
+## Detection Categories
+
+| Category          | Patterns | Examples                                                                       |
+| ----------------- | -------- | ------------------------------------------------------------------------------ |
+| Prompt Injection   | 8        | Instruction override, role reassignment, Unicode tricks, conditional triggers  |
+| Credential Theft   | 8        | SSH keys, AWS creds, API keys, env var exfiltration, wallet access             |
+| Malicious Payloads | 6        | Reverse shells, curl-pipe-to-shell, destructive ops, download-and-execute      |
+| Obfuscation        | 4        | Base64 strings, hex payloads, dynamic eval, encoded execution                  |
+| Supply Chain       | 3        | Postinstall scripts, registry overrides, git credential manipulation           |
+| Network            | 4        | IP literal connections, exfiltration patterns, encoded URLs, external domains   |
+| Structural         | 3        | Excessive tool permissions, unrestricted bash, file write access               |
+| Informational      | 3        | Env var reads, path traversal, subprocess spawning                             |
+
+### Operating Systems Compatibility
+
+| OS      | Status | Notes                                                    |
+| ------- | ------ | -------------------------------------------------------- |
+| macOS   | Supported   | Fully tested                                              |
+| Linux   | Supported   | All scripts use standard Python 3 — no OS-specific APIs   |
+| WSL     | Supported   | Runs natively in the WSL Linux environment                |
+| Windows | Supported   | Requires Python 3 on PATH; all scripts are native `.py` files with no bash/shell dependencies |
+
+
+## Requirements
+
+- **Python 3** available on PATH as `python3` or `python` (standard library only, no pip packages needed). The skill checks for Python availability before running and shows OS-specific install instructions if missing.
+- For MCP/hooks audit: Claude Code settings files accessible at their standard locations (resolved via `os.path.expanduser("~")` — works as `~/.claude/` on macOS/Linux and `C:\Users\<you>\.claude\` on Windows)
+- For skill audit: skill directory containing a `SKILL.md` file
