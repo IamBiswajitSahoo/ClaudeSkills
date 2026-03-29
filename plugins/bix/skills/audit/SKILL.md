@@ -4,7 +4,7 @@ description: Security audit for Claude Code skills, MCP servers, hooks, and CLAU
 metadata:
   author: Biswajit Sahoo (https://github.com/IamBiswajitSahoo)
   license: Apache-2.0
-argument-hint: "<mode> [target]  — modes: skill <path>, mcp [server], hooks, claudemd, all"
+argument-hint: "<mode> [target]  — modes: skill <path|url>, mcp [server|package], hooks, claudemd, all"
 ---
 
 # Security Audit
@@ -14,11 +14,17 @@ Audit Claude Code extension surfaces for security risks: skills, MCP servers, ho
 **Arguments:** `$ARGUMENTS` — the audit mode and optional target.
 
 **Modes:**
-- `skill <path>` — audit a skill directory before installing
-- `mcp [server-name]` — audit configured MCP servers (or a specific one)
+- `skill <path|url>` — audit a skill from a local path, GitHub URL, or GitHub subdirectory URL
+- `mcp [server-name|package]` — audit configured MCP servers, or fetch a specific npm package / GitHub URL to audit
 - `hooks` — audit hooks in settings.json
 - `claudemd` — audit CLAUDE.md files for prompt injection
 - `all` — run all audits on the current environment
+
+**Target formats (skill and mcp modes):**
+- Local path: `./path/to/skill` or `/absolute/path`
+- GitHub repo: `https://github.com/user/repo`
+- GitHub subdirectory: `https://github.com/user/repo/tree/main/skills/my-skill`
+- npm package (mcp only): `@scope/package-name`
 
 ---
 
@@ -49,22 +55,47 @@ Store the working python command (`python3` or `python`) for use in later phases
 ### Step 2 — Parse arguments
 
 Extract the mode and target from `$ARGUMENTS`:
-- If `$ARGUMENTS` starts with `skill`, extract the path (second argument). If no path given, use `AskUserQuestion`: "Which skill directory would you like to audit?"
-- If `$ARGUMENTS` starts with `mcp`, the optional second argument is a server name filter.
+- If `$ARGUMENTS` starts with `skill`, extract the target (second argument — can be a local path, GitHub URL, or GitHub subdirectory URL). If no target given, use `AskUserQuestion`:
+  > "What skill would you like to audit? You can provide:"
+  > - A **local path** — `./path/to/skill`
+  > - A **GitHub URL** — `https://github.com/user/repo`
+  > - A **GitHub subdirectory** — `https://github.com/user/repo/tree/main/skills/my-skill`
+- If `$ARGUMENTS` starts with `mcp`, the optional second argument can be:
+  - A configured server name (audits local config)
+  - A GitHub URL (downloads and audits the MCP server source)
+  - An npm package name like `@scope/package` (downloads and audits the package)
+  - Empty (audits all configured MCP servers)
 - If `$ARGUMENTS` is `hooks`, `claudemd`, or `all`, no extra arguments needed.
 - If `$ARGUMENTS` is empty or unrecognized, use `AskUserQuestion` to present the modes:
   > "What would you like to audit?"
-  > - **skill** — Audit a skill directory (requires path)
-  > - **mcp** — Audit configured MCP servers
+  > - **skill** — Audit a skill (local path or GitHub URL)
+  > - **mcp** — Audit MCP servers (configured, or fetch by URL/package name)
   > - **hooks** — Audit hooks in settings.json
   > - **claudemd** — Audit CLAUDE.md files
-  > - **all** — Run all audits
+  > - **all** — Run all audits on current environment
 
-### Step 3 — Validate target
+### Step 3 — Resolve target
 
-For `skill` mode: verify the path exists and contains a `SKILL.md`. If not, show the error and stop.
+For `skill` and `mcp` modes where a target is provided, resolve it to a local directory:
 
-For `mcp` mode: verify MCP config files exist. If none found, report "No MCP configuration found" and stop.
+```bash
+{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/resolve-target.py" "<target>" --type <skill|mcp>
+```
+
+The script outputs JSON with:
+- `source` — `local`, `github`, or `npm`
+- `resolved_path` — the local directory to audit
+- `is_temporary` — whether the directory was downloaded (should be cleaned up after audit)
+- `temp_root` — the temp directory to clean up (only if `is_temporary` is true)
+- `error` — if resolution failed, display this to the user and stop
+
+If the source is `github` or `npm`, inform the user: "Downloaded {source} target to temporary directory for auditing."
+
+For `mcp` mode without a target: verify MCP config files exist by running the gather script. If no servers found, report "No MCP servers configured" and stop.
+
+For `hooks` mode: no resolution needed — the gather script reads settings files directly.
+
+**Cleanup reminder:** If `is_temporary` is true, the temp directory at `temp_root` should be cleaned up after the audit completes. Note this for Phase 4.
 
 ---
 
@@ -234,6 +265,16 @@ Display the complete report to the user. If the verdict is DANGEROUS or MALICIOU
 
 ```
 > **WARNING:** This audit found serious security concerns. Do NOT install or use this {skill/plugin/config} without careful manual review of each finding.
+```
+
+If the source was a GitHub URL or npm package, include the original URL in the report header so the user knows exactly what was audited.
+
+### Step 4 — Cleanup
+
+If the target was downloaded (i.e., `is_temporary` is true from Phase 1 Step 3), clean up the temporary directory:
+
+```bash
+rm -rf "<temp_root>"
 ```
 
 ---

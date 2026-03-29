@@ -13,15 +13,30 @@ First, add the marketplace and install the `bix` plugin:
 
 ## Usage
 
-| Command                              | Behavior                                    |
-| ------------------------------------ | ------------------------------------------- |
-| `/bix:audit skill ./path/to/skill`   | Audit a skill directory before installing    |
-| `/bix:audit mcp`                     | Audit all configured MCP servers             |
-| `/bix:audit mcp my-server`           | Audit a specific MCP server                  |
-| `/bix:audit hooks`                   | Audit hooks in settings.json                 |
-| `/bix:audit claudemd`                | Audit CLAUDE.md files for prompt injection   |
-| `/bix:audit all`                     | Run all audits on current environment        |
-| `/bix:audit`                         | Interactive mode — prompts for what to audit |
+| Command | Behavior |
+| ------- | -------- |
+| `/bix:audit skill ./path/to/skill` | Audit a local skill directory |
+| `/bix:audit skill https://github.com/user/repo` | Download and audit a skill from GitHub |
+| `/bix:audit skill https://github.com/user/repo/tree/main/skills/foo` | Audit a specific subdirectory in a GitHub repo |
+| `/bix:audit mcp` | Audit all configured MCP servers |
+| `/bix:audit mcp my-server` | Audit a specific configured MCP server |
+| `/bix:audit mcp @scope/package` | Download and audit an npm MCP server package |
+| `/bix:audit mcp https://github.com/user/mcp-server` | Download and audit an MCP server from GitHub |
+| `/bix:audit hooks` | Audit hooks in settings.json |
+| `/bix:audit claudemd` | Audit CLAUDE.md files for prompt injection |
+| `/bix:audit all` | Run all audits on current environment |
+| `/bix:audit` | Interactive mode — prompts for what to audit |
+
+### Target Formats
+
+The `skill` and `mcp` modes accept multiple target formats so you can audit **before downloading or installing**:
+
+| Format | Example | What Happens |
+| ------ | ------- | ------------ |
+| Local path | `./my-skill` or `/abs/path` | Audits files directly on disk |
+| GitHub repo URL | `https://github.com/user/repo` | Shallow-clones the repo to a temp dir, audits, cleans up |
+| GitHub subdirectory | `https://github.com/user/repo/tree/main/path` | Clones the repo, audits only the specified subdirectory |
+| npm package (mcp only) | `@scope/mcp-server` | Downloads via `npm pack` (no scripts executed), audits, cleans up |
 
 ## Architecture
 
@@ -169,5 +184,7 @@ Audits CLAUDE.md files for prompt injection. Checks:
 ## Requirements
 
 - **Python 3** available on PATH as `python3` or `python` (standard library only, no pip packages needed). The skill checks for Python availability before running and shows OS-specific install instructions if missing.
+- **git** — required when auditing from GitHub URLs (shallow clone is used for speed)
+- **npm** — required only when auditing MCP servers by npm package name
 - For MCP/hooks audit: Claude Code settings files accessible at their standard locations (resolved via `os.path.expanduser("~")` — works as `~/.claude/` on macOS/Linux and `C:\Users\<you>\.claude\` on Windows)
-- For skill audit: skill directory containing a `SKILL.md` file
+- For skill audit: a local directory with `SKILL.md`, or a GitHub URL pointing to one
