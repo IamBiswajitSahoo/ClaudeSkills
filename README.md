@@ -46,7 +46,3 @@ Once installed, skills can be invoked in two ways:
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE)
-
----
-
-> *What does **bix** stand for? **B**iswajit's **I**ntelligent e**X**tensions* :)
