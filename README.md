@@ -17,17 +17,23 @@ Once installed, all skills are available under the `/bix:` prefix.
 
 ### GitHub
 
-- **`/bix:github-pr-review`** — Review a PR with severity-labeled findings, parallel agent support, and per-comment approval. [Full documentation →](docs/github-pr-review/README.md)
-- **`/bix:github-pr-describe`** — Generate a well-structured PR description by analyzing the diff, then push it to GitHub. [Full documentation →](docs/github-pr-describe/README.md)
-- **`/bix:github-pr-resolve`** — Evaluate and triage review comments on a PR, then implement agreed fixes. [Full documentation →](docs/github-pr-resolve/README.md)
+| Skill | Description | Docs |
+| ----- | ----------- | ---- |
+| `/bix:github-pr-review` | Review a PR with severity-labeled findings, parallel agent support, and per-comment approval | [Docs →](docs/github-pr-review/README.md) |
+| `/bix:github-pr-describe` | Generate a well-structured PR description by analyzing the diff, then push it to GitHub | [Docs →](docs/github-pr-describe/README.md) |
+| `/bix:github-pr-resolve` | Evaluate and triage review comments on a PR, then implement agreed fixes | [Docs →](docs/github-pr-resolve/README.md) |
 
 ### Security
 
-- **`/bix:audit`** — Security audit for Claude Code skills, MCP servers, hooks, and CLAUDE.md files — fast pattern scan with parallel deep-analysis agents. [Full documentation →](docs/audit/README.md)
+| Skill | Description | Docs |
+| ----- | ----------- | ---- |
+| `/bix:audit` | Security audit for skills, MCP servers, hooks, and CLAUDE.md — fast pattern scan with parallel deep-analysis agents | [Docs →](docs/audit/README.md) |
 
 ### Utilities
 
-- **`/bix:cleanup`** — Scan and clean up Claude Code's internal data (`~/.claude/`) to reclaim disk space. [Full documentation →](docs/cleanup/README.md)
+| Skill | Description | Docs |
+| ----- | ----------- | ---- |
+| `/bix:cleanup` | Scan and clean up Claude Code's internal data (`~/.claude/`) to reclaim disk space | [Docs →](docs/cleanup/README.md) |
 
 ## License
 
