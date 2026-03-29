@@ -1,0 +1,1 @@
+Summarize this entire conversation in a single concise paragraph (3-5 sentences). Cover: what the user wanted, what was done, and the current state. Keep it brief — this is a quick glance summary, not a detailed recap. Do not include code snippets or file paths unless they are the main topic.

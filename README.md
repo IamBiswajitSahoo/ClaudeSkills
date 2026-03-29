@@ -31,6 +31,12 @@ Once installed, skills can be invoked in two ways:
 | ----- | ------- | ----------- | ---- |
 | audit | `/audit` | Security audit for skills, MCP servers, hooks, and CLAUDE.md — fast pattern scan with parallel deep-analysis agents | [Docs →](docs/audit/README.md) |
 
+### Session Management
+
+| Skill | Command | Description | Docs |
+| ----- | ------- | ----------- | ---- |
+| load-session | `/load-session` | Load context from a previous session into the current one — browse, summarize, or load full transcript | [Docs →](docs/load-session/README.md) |
+
 ### Utilities
 
 | Skill | Command | Description | Docs |

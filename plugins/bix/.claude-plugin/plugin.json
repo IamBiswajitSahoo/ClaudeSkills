@@ -6,5 +6,5 @@
     "name": "Biswajit Sahoo"
   },
   "license": "Apache-2.0",
-  "keywords": ["utilities", "cleanup", "productivity", "maintenance", "github", "pull-request", "pr-review", "pr-resolve", "code-review", "security", "audit"]
+  "keywords": ["utilities", "cleanup", "productivity", "maintenance", "github", "pull-request", "pr-review", "pr-resolve", "code-review", "security", "audit", "session", "context", "load-session"]
 }
