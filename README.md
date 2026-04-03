@@ -12,8 +12,8 @@ A collection of useful Claude Code skills, distributed as a plugin marketplace.
 ```
 
 Once installed, skills can be invoked in two ways:
-- By skill name: `/audit`, `/cleanup`, `/github-pr-review` (shows as `(bix)` in autocomplete)
-- By full prefix: `/bix:audit`, `/bix:cleanup`, `/bix:github-pr-review`
+- By skill name: `/audit`, `/cleanup`, `/github-pr-review`, `/rewrite` (shows as `(bix)` in autocomplete)
+- By full prefix: `/bix:audit`, `/bix:cleanup`, `/bix:github-pr-review`, `/bix:rewrite`
 
 ## Available Skills
 
@@ -36,6 +36,12 @@ Once installed, skills can be invoked in two ways:
 | Skill | Command | Description | Docs |
 | ----- | ------- | ----------- | ---- |
 | load-session | `/load-session` | Load context from a previous session into the current one — browse, summarize, or load full transcript | [Docs →](docs/load-session/README.md) |
+
+### Prompt Engineering
+
+| Skill | Command | Description | Docs |
+| ----- | ------- | ----------- | ---- |
+| rewrite | `/rewrite` | Rewrite prompts using 12 curated prompt engineering frameworks (RISEN, TIDD-EC, CO-STAR, etc.) via a fast haiku sub-agent | [Docs →](docs/rewrite/README.md) |
 
 ### Utilities
 
