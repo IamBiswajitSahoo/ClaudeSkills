@@ -7,5 +7,14 @@
   },
   "license": "Apache-2.0",
   "keywords": ["utilities", "cleanup", "productivity", "maintenance", "github", "pull-request", "pr-review", "pr-resolve", "code-review", "security", "audit", "session", "context", "load-session", "rewrite", "prompt-engineering"],
-  "agents": ["./agents/load-session/", "./agents/pr-review/", "./agents/rewrite/"]
+  "agents": ["./agents/load-session/", "./agents/pr-review/", "./agents/rewrite/"],
+  "skills": [
+    "./skills/audit/",
+    "./skills/cleanup/",
+    "./skills/github-pr-describe/",
+    "./skills/github-pr-resolve/",
+    "./skills/github-pr-review/",
+    "./skills/load-session/",
+    "./skills/rewrite/"
+  ]
 }
