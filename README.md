@@ -31,16 +31,11 @@ Once installed, skills can be invoked in two ways:
 | ----- | ------- | ----------- | ---- |
 | audit | `/audit` | Security audit for skills, MCP servers, hooks, and CLAUDE.md — fast pattern scan with parallel deep-analysis agents | [Docs →](docs/audit/README.md) |
 
-### Session Management
+### Productivity
 
 | Skill | Command | Description | Docs |
 | ----- | ------- | ----------- | ---- |
 | load-session | `/load-session` | Load context from a previous session into the current one — browse, summarize, or load full transcript | [Docs →](docs/load-session/README.md) |
-
-### Prompt Engineering
-
-| Skill | Command | Description | Docs |
-| ----- | ------- | ----------- | ---- |
 | rewrite | `/rewrite` | Rewrite prompts using 12 curated prompt engineering frameworks (RISEN, TIDD-EC, CO-STAR, etc.) via a fast haiku sub-agent | [Docs →](docs/rewrite/README.md) |
 
 ### Utilities
