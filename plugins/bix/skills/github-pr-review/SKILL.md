@@ -67,12 +67,19 @@ Read the full diff. Evaluate all 5 categories sequentially. For each genuine iss
 
 ### Parallel mode
 
-Launch 5 `Agent` calls in parallel — one per review category. Each agent receives:
-- The diff content and PR metadata
-- Project rules (CLAUDE.md/REVIEW.md) if present
-- Its specific category instructions from `review-categories.md`
+Launch 6 `Agent` calls in parallel using the dedicated review sub-agents. Each agent receives the diff content, PR metadata, and project rules (CLAUDE.md/REVIEW.md) if present as part of its prompt.
 
-Each agent returns its findings as a list. After all agents complete, deduplicate: if multiple agents flag the same `path:line`, keep the finding with the higher severity.
+The 5 category agents (launch all in parallel):
+1. `pr-review-correctness` — logic errors, null safety, data integrity, edge cases, regression risk
+2. `pr-review-conventions` — naming, code organization, error handling patterns, consistency
+3. `pr-review-performance` — hot-path allocations, algorithmic complexity, redundant computation
+4. `pr-review-security` — input validation, injection risks, data exposure, access control
+5. `pr-review-tests` — missing tests, untested edge cases, stale tests, weak assertions
+
+The 6th agent (launch in parallel with the above):
+6. `pr-review-docs` — missing or stale documentation on public API surfaces. Also pass `primary_language` to this agent. If `primary_language` is null or unsupported, skip this agent entirely.
+
+Each agent returns a JSON array of findings (`path`, `line`, `body`, `severity`). After all agents complete, parse and merge the arrays, then deduplicate: if multiple agents flag the same `path:line`, keep the finding with the higher severity.
 
 ### Pre-existing issue detection (both modes)
 
@@ -93,13 +100,11 @@ Compare the blamed commit against the PR's commit range. If the code predates th
 
 ## Phase 3: Documentation Review
 
-**Skip this phase in parallel mode** — it runs as a 6th agent alongside Phase 2.
+**Skip this phase in parallel mode** — it is already handled by the `pr-review-docs` sub-agent in Phase 2.
 
 If `primary_language` is null or not supported, skip with a note: "Skipping doc review — unsupported or undetected language."
 
 Otherwise, load `${CLAUDE_SKILL_DIR}/templates/doc-review-guide.md` and apply the language-specific rules to the diff. Add doc findings to the list (Nit for missing, Warning for stale).
-
-In **parallel mode**, launch this as an additional Agent alongside the 5 category agents in Phase 2.
 
 ---
 
