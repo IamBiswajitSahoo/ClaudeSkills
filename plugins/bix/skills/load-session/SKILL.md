@@ -190,18 +190,16 @@ Parse the session into a markdown transcript using the same parser as Full mode:
 
 Store the full transcript output — this will be passed to the summarization agent.
 
-### Step 4 — Summarize via sub-agent
+### Step 4 — Summarize via the `session-summarizer` sub-agent
 
-Read the agent definition file:
+> **CRITICAL: You MUST delegate summarization to the `session-summarizer` sub-agent. Do NOT summarize the transcript yourself. Do NOT use `claude --resume`. Do NOT use Bash.**
 
-```bash
-cat "${CLAUDE_SKILL_DIR}/agents/session-summarizer.md"
-```
+This plugin provides a `session-summarizer` sub-agent (defined in `plugins/bix/agents/session-summarizer.md`). Invoke it using the **Agent** tool with `subagent_type: "bix:session-summarizer"`.
 
-Launch a sub-agent (using the **Agent** tool) to perform the summarization. Pass the agent definition content, the transcript, and the template as the agent prompt:
+Pass the transcript and template as the task prompt:
 
 ```
-{session_summarizer_agent_content}
+Summarize the following session transcript using the template below.
 
 ---
 TRANSCRIPT:
@@ -214,11 +212,11 @@ SUMMARIZATION TEMPLATE:
 {template_prompt_text}
 ```
 
-Use `model: "sonnet"` for the agent (fast and cost-effective for summarization). Set the `description` to "Summarize session: {display_name}".
+Set `description` to `"Summarize session: {display_name}"`.
 
-The agent's returned result is the summary text.
+The sub-agent's returned result is the summary text. Use it directly in Step 5.
 
-If the agent returns an error or empty result, inform the user and suggest trying a different template or switching to full mode.
+If the sub-agent returns an error or empty result, inform the user and suggest trying a different template or switching to full mode.
 
 ### Step 5 — Inject summary
 
@@ -276,7 +274,7 @@ Report what was loaded:
 - ALWAYS present the paginated session browser when no session name argument is given
 - ALWAYS show template options for compact mode — auto-highlight the recommended template but let the user choose
 - Support custom summarization prompts — inline text or file path to .md or .txt files
-- Compact mode summarization MUST use a sub-agent (Agent tool) — do NOT shell out to `claude --resume` or any external CLI process for summarization
+- **CRITICAL** — Compact mode summarization MUST delegate to the `session-summarizer` sub-agent via `subagent_type: "bix:session-summarizer"`. You MUST NOT: (1) run `claude --resume` via Bash, (2) summarize the transcript yourself inline, or (3) use any other approach. Delegating to the sub-agent is a hard requirement, not a suggestion.
 - Scripts output JSON with an `error` field on failure — always check for it and display the error to the user
 - Do not attempt to load the current active session — it would create a recursive loop
 - If the resolved session UUID matches `${CLAUDE_SESSION_ID}`, stop and inform the user: "Cannot load the current session into itself."
