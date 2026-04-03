@@ -47,23 +47,31 @@ Extract the optional session name from `$ARGUMENTS`:
 Run the list script to fetch recent sessions:
 
 ```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/list-sessions.py" --page 1 --per-page 5
+{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/list-sessions.py" --page 1
 ```
 
 The script outputs JSON with:
 - `total` — total session count
 - `page`, `per_page`, `total_pages` — pagination info
 - `projects` — list of unique project paths (for project tabs)
-- `sessions` — array of session objects with `uuid`, `display_name`, `is_named`, `project`, `file_size_bytes`, `message_count`, `started_at`, `git_branch`, `last_modified`
+- `sessions` — array of session objects with `uuid`, `display_name`, `is_named`, `project`, `project_short`, `file_size_bytes`, `file_size_human`, `message_count`, `started_at`, `started_at_short`, `last_modified`, `last_modified_relative`, `git_branch`
 
-Present the sessions to the user via `AskUserQuestion`. Format as a numbered list:
+Present the sessions to the user via `AskUserQuestion`. Format as a table-style list with aligned columns. Each row shows the key details at a glance:
 
-> **Select a session to load** (page 1 of N):
+> **Select a session to load** (page {page} of {total_pages}, {total} sessions)
 >
-> 1. **{display_name}** — {project} · {git_branch} · {message_count} msgs · {file_size_human}
-> 2. ...
+> | # | Session | Project | Branch | Messages | Size | Last active |
+> |---|---------|---------|--------|----------|------|-------------|
+> | 1 | {display_name} | {project_short} | {git_branch} | {message_count} | {file_size_human} | {last_modified_relative} |
+> | 2 | ... | ... | ... | ... | ... | ... |
 >
-> **[N]** Next page | **[P]** Previous page | **[project-name]** Filter by project | **[C]** Cancel
+> Enter a **number** to select, **N/P** for next/prev page, or **C** to cancel.
+
+Formatting rules:
+- Truncate `display_name` to 50 characters max, append "..." if truncated
+- If `git_branch` is empty, show "—"
+- If `last_modified_relative` is empty, show the `started_at_short` value instead
+- Show the `project_short` (last path component) not the full path — keeps the table compact
 
 If the user selects a session number, extract its `uuid` and `display_name`.
 If the user types "N" or "P", re-run the list script with the updated `--page` value.
@@ -172,21 +180,47 @@ If the user selects 8 (Custom), use `AskUserQuestion`:
 
 If the response is a file path, read the file. Otherwise, use the text as the prompt directly.
 
-### Step 3 — Run summarization
+### Step 3 — Extract transcript
 
-Execute the summarization using `claude --resume` in headless mode:
+Parse the session into a markdown transcript using the same parser as Full mode:
 
 ```bash
-claude --resume "{uuid}" -p "{template_prompt_text}" --output-format json
+{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/parse-session.py" "<jsonl_path>" --format markdown
 ```
 
-**Important:** The `--resume` flag in headless `-p` mode requires a UUID, not a session name. The UUID was resolved in Phase 2.
+Store the full transcript output — this will be passed to the summarization agent.
 
-Parse the JSON output and extract the `result` field — this is the summary text.
+### Step 4 — Summarize via sub-agent
 
-If the command fails, display the error and suggest the user try a different template or use full mode instead.
+Read the agent definition file:
 
-### Step 4 — Inject summary
+```bash
+cat "${CLAUDE_SKILL_DIR}/agents/session-summarizer.md"
+```
+
+Launch a sub-agent (using the **Agent** tool) to perform the summarization. Pass the agent definition content, the transcript, and the template as the agent prompt:
+
+```
+{session_summarizer_agent_content}
+
+---
+TRANSCRIPT:
+
+{transcript_text}
+
+---
+SUMMARIZATION TEMPLATE:
+
+{template_prompt_text}
+```
+
+Use `model: "sonnet"` for the agent (fast and cost-effective for summarization). Set the `description` to "Summarize session: {display_name}".
+
+The agent's returned result is the summary text.
+
+If the agent returns an error or empty result, inform the user and suggest trying a different template or switching to full mode.
+
+### Step 5 — Inject summary
 
 Output the summary to the user as a clearly-marked block:
 
@@ -242,7 +276,7 @@ Report what was loaded:
 - ALWAYS present the paginated session browser when no session name argument is given
 - ALWAYS show template options for compact mode — auto-highlight the recommended template but let the user choose
 - Support custom summarization prompts — inline text or file path to .md or .txt files
-- The `claude --resume <uuid> -p` command requires a UUID — name resolution does NOT work in headless mode
+- Compact mode summarization MUST use a sub-agent (Agent tool) — do NOT shell out to `claude --resume` or any external CLI process for summarization
 - Scripts output JSON with an `error` field on failure — always check for it and display the error to the user
 - Do not attempt to load the current active session — it would create a recursive loop
 - If the resolved session UUID matches `${CLAUDE_SESSION_ID}`, stop and inform the user: "Cannot load the current session into itself."

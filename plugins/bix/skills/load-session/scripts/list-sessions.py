@@ -12,9 +12,58 @@ import os
 import json
 import re
 import argparse
+from datetime import datetime, timezone
 
 
-def list_sessions(claude_dir, page=1, per_page=5, project_filter=""):
+def relative_time(ts_str):
+    """Convert an ISO timestamp string to a human-friendly relative time."""
+    if not ts_str:
+        return ""
+    try:
+        # Parse ISO format, handle both Z and +00:00 suffixes
+        ts_str_clean = ts_str.replace("Z", "+00:00")
+        dt = datetime.fromisoformat(ts_str_clean)
+        now = datetime.now(timezone.utc)
+        diff = now - dt
+        secs = int(diff.total_seconds())
+        if secs < 0:
+            return "just now"
+        if secs < 60:
+            return "just now"
+        mins = secs // 60
+        if mins < 60:
+            return f"{mins}m ago"
+        hours = mins // 60
+        if hours < 24:
+            return f"{hours}h ago"
+        days = hours // 24
+        if days < 7:
+            return f"{days}d ago"
+        if days < 30:
+            weeks = days // 7
+            return f"{weeks}w ago"
+        if days < 365:
+            months = days // 30
+            return f"{months}mo ago"
+        years = days // 365
+        return f"{years}y ago"
+    except Exception:
+        return ""
+
+
+def format_timestamp(ts_str):
+    """Convert an ISO timestamp to a short readable format like 'Apr 3, 14:22'."""
+    if not ts_str:
+        return ""
+    try:
+        ts_str_clean = ts_str.replace("Z", "+00:00")
+        dt = datetime.fromisoformat(ts_str_clean).astimezone()
+        return dt.strftime("%b %-d, %H:%M")
+    except Exception:
+        return ""
+
+
+def list_sessions(claude_dir, page=1, per_page=15, project_filter=""):
     projects_dir = os.path.join(claude_dir, "projects")
     uuid_pattern = re.compile(
         r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
@@ -97,6 +146,12 @@ def list_sessions(claude_dir, page=1, per_page=5, project_filter=""):
             except Exception:
                 continue
 
+            # Strip XML/HTML tags from first user message fallback
+            if first_user_msg and not custom_title:
+                first_user_msg = re.sub(r"<[^>]+>", "", first_user_msg).strip()
+                # Collapse multiple whitespace
+                first_user_msg = re.sub(r"\s+", " ", first_user_msg)
+
             display_name = custom_title or first_user_msg or "unnamed session"
             last_modified = os.path.getmtime(jsonl_file)
 
@@ -108,19 +163,25 @@ def list_sessions(claude_dir, page=1, per_page=5, project_filter=""):
             else:
                 size_human = f"{file_size / 1048576:.1f} MB"
 
+            # Derive short project name (last path component)
+            proj_short = proj_path.rstrip("/").rsplit("/", 1)[-1] if proj_path else ""
+
             sessions.append(
                 {
                     "uuid": uuid,
                     "display_name": display_name,
                     "is_named": bool(custom_title),
                     "project": proj_path,
+                    "project_short": proj_short,
                     "project_dir": proj_name,
                     "file_size_bytes": file_size,
                     "file_size_human": size_human,
                     "message_count": user_msg_count,
                     "started_at": started_at,
-                    "git_branch": git_branch,
+                    "started_at_short": format_timestamp(started_at),
                     "last_modified": last_modified,
+                    "last_modified_relative": relative_time(last_timestamp),
+                    "git_branch": git_branch,
                 }
             )
 
@@ -147,7 +208,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="List Claude Code sessions")
     parser.add_argument("--project", default="", help="Filter by project path")
     parser.add_argument("--page", type=int, default=1, help="Page number")
-    parser.add_argument("--per-page", type=int, default=5, help="Sessions per page")
+    parser.add_argument("--per-page", type=int, default=15, help="Sessions per page")
     args = parser.parse_args()
 
     claude_dir = os.path.join(os.path.expanduser("~"), ".claude")
