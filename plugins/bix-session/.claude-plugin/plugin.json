@@ -1,6 +1,6 @@
 {
   "name": "bix-session",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Load context from a previous Claude Code session into the current one — compact summary or full transcript, with smart template auto-selection.",
   "author": {
     "name": "Biswajit Sahoo"

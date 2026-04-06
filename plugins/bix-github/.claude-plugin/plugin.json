@@ -1,6 +1,6 @@
 {
   "name": "bix-github",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "GitHub PR workflow skills — describe, review (with optional parallel agents), and resolve review comments.",
   "author": {
     "name": "Biswajit Sahoo"

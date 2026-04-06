@@ -30,6 +30,8 @@ for f in files:
     if isinstance(data, dict) and "plugins" in data and isinstance(data["plugins"], list):
         for p in data["plugins"]:
             p["version"] = version
+    if isinstance(data, dict) and isinstance(data.get("metadata"), dict) and "version" in data["metadata"]:
+        data["metadata"]["version"] = version
     if "version" in data:
         data["version"] = version
     f.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
