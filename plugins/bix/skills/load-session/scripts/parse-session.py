@@ -227,12 +227,13 @@ def format_as_markdown(result):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(json.dumps({"error": "Usage: parse-session.py <jsonl-path> [--max-chars <n>] [--format json|markdown]"}))
+        print(json.dumps({"error": "Usage: parse-session.py <jsonl-path> [--max-chars <n>] [--format json|markdown] [--out-file <path>]"}))
         sys.exit(1)
 
     jsonl_path = sys.argv[1]
     max_chars = None
     output_format = "markdown"
+    out_file = None
 
     i = 2
     while i < len(sys.argv):
@@ -242,10 +243,40 @@ if __name__ == "__main__":
         elif sys.argv[i] == "--format" and i + 1 < len(sys.argv):
             output_format = sys.argv[i + 1]
             i += 2
+        elif sys.argv[i] == "--out-file" and i + 1 < len(sys.argv):
+            out_file = sys.argv[i + 1]
+            i += 2
         else:
             i += 1
 
     result = parse_session(jsonl_path, max_chars=max_chars)
+
+    # --out-file: write transcript to disk, return only metadata to stdout.
+    # Keeps the (potentially huge) transcript out of the caller's context.
+    if out_file:
+        if "error" in result:
+            print(json.dumps(result))
+            sys.exit(1)
+        markdown = format_as_markdown(result)
+        try:
+            import tempfile
+            if out_file == "auto":
+                fd, out_file = tempfile.mkstemp(
+                    prefix="bix-load-session-", suffix=".md"
+                )
+                os.close(fd)
+            with open(out_file, "w") as f:
+                f.write(markdown)
+        except Exception as e:
+            print(json.dumps({"error": f"Failed to write transcript: {e}"}))
+            sys.exit(1)
+        print(json.dumps({
+            "transcript_path": out_file,
+            "char_count": result["stats"]["char_count"],
+            "estimated_tokens": result["stats"]["estimated_tokens"],
+            "entries": result["stats"]["total_entries"],
+        }))
+        sys.exit(0)
 
     if output_format == "json":
         print(json.dumps(result, indent=2))

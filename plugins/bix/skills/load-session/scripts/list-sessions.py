@@ -169,6 +169,7 @@ def list_sessions(claude_dir, page=1, per_page=15, project_filter=""):
             sessions.append(
                 {
                     "uuid": uuid,
+                    "jsonl_path": jsonl_file,
                     "display_name": display_name,
                     "is_named": bool(custom_title),
                     "project": proj_path,
@@ -204,13 +205,44 @@ def list_sessions(claude_dir, page=1, per_page=15, project_filter=""):
     }
 
 
+def to_compact(result):
+    """Strip listing payload down to fields the skill actually renders."""
+    if "error" in result:
+        return result
+    compact_sessions = []
+    for idx, s in enumerate(result["sessions"], start=1):
+        name = s.get("display_name", "") or "unnamed"
+        if len(name) > 50:
+            name = name[:47] + "..."
+        compact_sessions.append({
+            "i": idx,
+            "uuid": s["uuid"],  # kept so the skill can resolve without a second scan
+            "jsonl_path": s["jsonl_path"],
+            "name": name,
+            "project": s.get("project_short", ""),
+            "branch": s.get("git_branch", "") or "—",
+            "msgs": s.get("message_count", 0),
+            "size": s.get("file_size_human", ""),
+            "last": s.get("last_modified_relative", "") or s.get("started_at_short", ""),
+        })
+    return {
+        "page": result["page"],
+        "total_pages": result["total_pages"],
+        "total": result["total"],
+        "sessions": compact_sessions,
+    }
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="List Claude Code sessions")
     parser.add_argument("--project", default="", help="Filter by project path")
     parser.add_argument("--page", type=int, default=1, help="Page number")
     parser.add_argument("--per-page", type=int, default=15, help="Sessions per page")
+    parser.add_argument("--compact", action="store_true", help="Return only fields the skill renders")
     args = parser.parse_args()
 
     claude_dir = os.path.join(os.path.expanduser("~"), ".claude")
     result = list_sessions(claude_dir, args.page, args.per_page, args.project)
+    if args.compact:
+        result = to_compact(result)
     print(json.dumps(result, indent=2))

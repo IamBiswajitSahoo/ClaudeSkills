@@ -162,8 +162,11 @@ def detect_template(jsonl_path):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(json.dumps({"error": "Usage: detect-template.py <jsonl-path>"}))
+        print(json.dumps({"error": "Usage: detect-template.py <jsonl-path> [--verbose]"}))
         sys.exit(1)
 
+    verbose = "--verbose" in sys.argv
     result = detect_template(sys.argv[1])
+    if not verbose and "signals" in result:
+        result.pop("signals", None)
     print(json.dumps(result, indent=2))

@@ -99,7 +99,7 @@ def estimate_context(jsonl_path):
     else:
         size_human = f"{file_size / 1048576:.1f} MB"
 
-    return {
+    full = {
         "file_size_bytes": file_size,
         "file_size_human": size_human,
         "line_count": line_count,
@@ -117,12 +117,30 @@ def estimate_context(jsonl_path):
         "ended_at": ended,
         "budget_warning": full_pct > 40,
     }
+    return full
+
+
+def to_compact(full):
+    if "error" in full:
+        return full
+    return {
+        "file_size_human": full["file_size_human"],
+        "user_messages": full["user_messages"],
+        "assistant_messages": full["assistant_messages"],
+        "estimated_tokens_text": full["estimated_tokens_text"],
+        "context_pct_full": full["context_pct_full"],
+        "duration_minutes": full["duration_minutes"],
+        "budget_warning": full["budget_warning"],
+    }
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print(json.dumps({"error": "Usage: estimate-context.py <jsonl-path>"}))
+        print(json.dumps({"error": "Usage: estimate-context.py <jsonl-path> [--verbose]"}))
         sys.exit(1)
 
+    verbose = "--verbose" in sys.argv
     result = estimate_context(sys.argv[1])
+    if not verbose:
+        result = to_compact(result)
     print(json.dumps(result, indent=2))
