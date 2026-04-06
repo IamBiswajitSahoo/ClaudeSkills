@@ -1,6 +1,6 @@
 ---
 name: pr-review-security
-description: Reviews PR diffs for security vulnerabilities — input validation, injection risks, sensitive data exposure, access control, and unsafe operations. Use when the github-pr-review skill runs in parallel mode.
+description: Reviews PR diffs for security — input validation, injection, sensitive data exposure, access control, unsafe operations.
 model: sonnet
 tools: Read, Grep, Glob, Bash
 ---

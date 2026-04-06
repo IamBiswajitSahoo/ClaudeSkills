@@ -1,6 +1,6 @@
 ---
 name: pr-review-conventions
-description: Reviews PR diffs for project convention violations — naming, code organization, error handling patterns, consistency, and magic numbers. Use when the github-pr-review skill runs in parallel mode.
+description: Reviews PR diffs for project convention violations — naming, code organization, error handling, consistency, magic numbers.
 model: sonnet
 tools: Read, Grep, Glob, Bash
 ---

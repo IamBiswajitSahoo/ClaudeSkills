@@ -1,6 +1,6 @@
 ---
 name: pr-review-tests
-description: Reviews PR diffs for test coverage gaps — missing tests for new public APIs, untested edge cases, stale tests, and weak assertions. Use when the github-pr-review skill runs in parallel mode.
+description: Reviews PR diffs for test gaps — missing tests for new APIs, untested edge cases, stale tests, weak assertions.
 model: sonnet
 tools: Read, Grep, Glob, Bash
 ---

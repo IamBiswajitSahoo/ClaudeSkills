@@ -1,6 +1,6 @@
 ---
 name: prompt-rewriter
-description: Rewrites user prompts using a specified prompt engineering framework template. Receives the original prompt and a framework template, returns only the rewritten prompt text.
+description: Rewrites a prompt using a specified prompt engineering framework template.
 model: haiku
 tools: ""
 ---

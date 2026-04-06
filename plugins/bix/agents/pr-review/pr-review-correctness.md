@@ -1,6 +1,6 @@
 ---
 name: pr-review-correctness
-description: Reviews PR diffs for code correctness issues — logic errors, null safety, data integrity, edge cases, API contract violations, and regression risk. Use when the github-pr-review skill runs in parallel mode.
+description: Reviews PR diffs for correctness — logic errors, null safety, data integrity, edge cases, API contracts, regression risk.
 model: sonnet
 tools: Read, Grep, Glob, Bash
 ---

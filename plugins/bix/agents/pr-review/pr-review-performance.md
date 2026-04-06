@@ -1,6 +1,6 @@
 ---
 name: pr-review-performance
-description: Reviews PR diffs for performance issues — hot-path allocations, algorithmic complexity, redundant computation, data structure choice, and large-scope impact. Use when the github-pr-review skill runs in parallel mode.
+description: Reviews PR diffs for performance — hot-path allocations, complexity, redundant computation, data structure choice.
 model: sonnet
 tools: Read, Grep, Glob, Bash
 ---

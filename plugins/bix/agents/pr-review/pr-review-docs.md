@@ -1,6 +1,6 @@
 ---
 name: pr-review-docs
-description: Reviews PR diffs for missing or stale documentation on public API surfaces — doc comments, parameter docs, return docs, exception docs. Use when the github-pr-review skill runs in parallel mode.
+description: Reviews PR diffs for missing or stale docs on public APIs — doc comments, params, returns, exceptions.
 model: sonnet
 tools: Read, Grep, Glob, Bash
 ---

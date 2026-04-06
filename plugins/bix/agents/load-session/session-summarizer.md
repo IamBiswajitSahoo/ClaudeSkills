@@ -1,6 +1,6 @@
 ---
 name: session-summarizer
-description: Summarizes Claude Code session transcripts using a selected template. Use when the load-session skill needs to produce a compact summary of a previous session's transcript.
+description: Summarizes a Claude Code session transcript file using a provided template.
 model: sonnet
 tools: Read, Bash
 ---
