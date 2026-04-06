@@ -143,7 +143,7 @@ Store the template text for use in Phase 3.
 
 > **CRITICAL: You MUST delegate the rewriting to the `prompt-rewriter` sub-agent. Do NOT rewrite the prompt yourself inline.**
 
-This plugin provides a `prompt-rewriter` sub-agent (defined in `plugins/bix/agents/rewrite/prompt-rewriter.md`). Invoke it using the **Agent** tool with `subagent_type: "bix:prompt-rewriter"`.
+This plugin provides a `prompt-rewriter` sub-agent (defined in `plugins/bix/agents/rewrite/prompt-rewriter.md`). Invoke it using the **Agent** tool with `subagent_type: "bix:rewrite:prompt-rewriter"`.
 
 Pass the original prompt and template as the task prompt:
 
@@ -217,7 +217,7 @@ Then output the rewritten prompt text verbatim.
 
 ## Important Rules
 
-- **ALWAYS delegate rewriting** to the `prompt-rewriter` sub-agent via `subagent_type: "bix:prompt-rewriter"`. Never rewrite inline.
+- **ALWAYS delegate rewriting** to the `prompt-rewriter` sub-agent via `subagent_type: "bix:rewrite:prompt-rewriter"`. Never rewrite inline.
 - **NEVER modify the user's intent** — the rewrite restructures and clarifies, it does not add new requirements or change the goal.
 - **ALWAYS present the rewritten prompt** for user approval before acting on it.
 - If the sub-agent returns an error or empty result, inform the user and suggest trying a different framework.

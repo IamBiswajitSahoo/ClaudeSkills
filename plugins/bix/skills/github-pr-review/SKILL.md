@@ -69,15 +69,17 @@ Read the full diff. Evaluate all 5 categories sequentially. For each genuine iss
 
 Launch 6 `Agent` calls in parallel using the dedicated review sub-agents. Each agent receives the diff content, PR metadata, and project rules (CLAUDE.md/REVIEW.md) if present as part of its prompt.
 
+**You MUST invoke each agent via the Agent tool using its fully-qualified `subagent_type`** (the `bix:pr-review:` prefix is required — without it the call falls back to `general-purpose` on the parent model and ignores the agent's `model:` frontmatter).
+
 The 5 category agents (launch all in parallel):
-1. `pr-review-correctness` — logic errors, null safety, data integrity, edge cases, regression risk
-2. `pr-review-conventions` — naming, code organization, error handling patterns, consistency
-3. `pr-review-performance` — hot-path allocations, algorithmic complexity, redundant computation
-4. `pr-review-security` — input validation, injection risks, data exposure, access control
-5. `pr-review-tests` — missing tests, untested edge cases, stale tests, weak assertions
+1. `subagent_type: "bix:pr-review:pr-review-correctness"` — logic errors, null safety, data integrity, edge cases, regression risk
+2. `subagent_type: "bix:pr-review:pr-review-conventions"` — naming, code organization, error handling patterns, consistency
+3. `subagent_type: "bix:pr-review:pr-review-performance"` — hot-path allocations, algorithmic complexity, redundant computation
+4. `subagent_type: "bix:pr-review:pr-review-security"` — input validation, injection risks, data exposure, access control
+5. `subagent_type: "bix:pr-review:pr-review-tests"` — missing tests, untested edge cases, stale tests, weak assertions
 
 The 6th agent (launch in parallel with the above):
-6. `pr-review-docs` — missing or stale documentation on public API surfaces. Also pass `primary_language` to this agent. If `primary_language` is null or unsupported, skip this agent entirely.
+6. `subagent_type: "bix:pr-review:pr-review-docs"` — missing or stale documentation on public API surfaces. Also pass `primary_language` to this agent. If `primary_language` is null or unsupported, skip this agent entirely.
 
 Each agent returns a JSON array of findings (`path`, `line`, `body`, `severity`). After all agents complete, parse and merge the arrays, then deduplicate: if multiple agents flag the same `path:line`, keep the finding with the higher severity.
 

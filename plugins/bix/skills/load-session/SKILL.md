@@ -194,7 +194,7 @@ Store the full transcript output — this will be passed to the summarization ag
 
 > **CRITICAL: You MUST delegate summarization to the `session-summarizer` sub-agent. Do NOT summarize the transcript yourself. Do NOT use `claude --resume`. Do NOT use Bash.**
 
-This plugin provides a `session-summarizer` sub-agent (defined in `plugins/bix/agents/session-summarizer.md`). Invoke it using the **Agent** tool with `subagent_type: "bix:session-summarizer"`.
+This plugin provides a `session-summarizer` sub-agent (defined in `plugins/bix/agents/load-session/session-summarizer.md`). Invoke it using the **Agent** tool with `subagent_type: "bix:load-session:session-summarizer"`.
 
 Pass the transcript and template as the task prompt:
 
@@ -274,7 +274,7 @@ Report what was loaded:
 - ALWAYS present the paginated session browser when no session name argument is given
 - ALWAYS show template options for compact mode — auto-highlight the recommended template but let the user choose
 - Support custom summarization prompts — inline text or file path to .md or .txt files
-- **CRITICAL** — Compact mode summarization MUST delegate to the `session-summarizer` sub-agent via `subagent_type: "bix:session-summarizer"`. You MUST NOT: (1) run `claude --resume` via Bash, (2) summarize the transcript yourself inline, or (3) use any other approach. Delegating to the sub-agent is a hard requirement, not a suggestion.
+- **CRITICAL** — Compact mode summarization MUST delegate to the `session-summarizer` sub-agent via `subagent_type: "bix:load-session:session-summarizer"`. You MUST NOT: (1) run `claude --resume` via Bash, (2) summarize the transcript yourself inline, or (3) use any other approach. Delegating to the sub-agent is a hard requirement, not a suggestion.
 - Scripts output JSON with an `error` field on failure — always check for it and display the error to the user
 - Do not attempt to load the current active session — it would create a recursive loop
 - If the resolved session UUID matches `${CLAUDE_SESSION_ID}`, stop and inform the user: "Cannot load the current session into itself."
