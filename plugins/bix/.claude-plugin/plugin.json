@@ -1,20 +1,11 @@
 {
   "name": "bix",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A collection of useful Claude Code skills for everyday productivity",
   "author": {
     "name": "Biswajit Sahoo"
   },
   "license": "Apache-2.0",
   "keywords": ["utilities", "cleanup", "productivity", "maintenance", "github", "pull-request", "pr-review", "pr-resolve", "code-review", "security", "audit", "session", "context", "load-session", "rewrite", "prompt-engineering"],
-  "agents": ["./agents/load-session/", "./agents/pr-review/", "./agents/rewrite/"],
-  "skills": [
-    "./skills/audit/",
-    "./skills/cleanup/",
-    "./skills/github-pr-describe/",
-    "./skills/github-pr-resolve/",
-    "./skills/github-pr-review/",
-    "./skills/load-session/",
-    "./skills/rewrite/"
-  ]
+  "agents": ["./agents/load-session/", "./agents/pr-review/", "./agents/rewrite/"]
 }
