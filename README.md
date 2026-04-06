@@ -12,6 +12,8 @@
 
 A collection of useful Claude Code skills, distributed as a plugin marketplace.
 
+These skills are intentionally designed to be **token-efficient** — pushing context-heavy work into deterministic scripts and focused sub-agents instead of bloating the main conversation — and to **keep a human in the loop** wherever a decision matters (review approval, fix triage, destructive cleanup, prompt rewrites, session loading).
+
 ## Installation
 
 ```
@@ -51,15 +53,13 @@ Install only the plugins you need. Once installed, skills can be invoked by name
 
 All skills run on **macOS**, **Linux**, and **WSL**. On **Windows native**, support depends on the script runtime:
 
-| Plugin | Script runtime | macOS | Linux | WSL | Windows native |
-| ------ | -------------- | :---: | :---: | :-: | :------------: |
-| bix-github | bash + `gh` CLI | ✅ | ✅ | ✅ | Git Bash / MSYS2 |
-| bix-session | Python (stdlib) + bash cleanup hook | ✅ | ✅ | ✅ | Git Bash / MSYS2 |
-| bix-utils → audit | Python (stdlib) | ✅ | ✅ | ✅ | ✅ |
-| bix-utils → rewrite | Pure prompt (no scripts) | ✅ | ✅ | ✅ | ✅ |
-| bix-utils → cleanup | bash (cross-platform `OSTYPE` branches) | ✅ | ✅ | ✅ | Git Bash / MSYS2 / Cygwin |
-
-Claude Code on Windows already ships a POSIX shell environment, so the bash-based skills work out of the box there.
+| Plugin | macOS | Linux | WSL | Windows native |
+| ------ | :---: | :---: | :-: | :------------: |
+| bix-github | ✅ | ✅ | ✅ | Git Bash / MSYS2 |
+| bix-session | ✅ | ✅ | ✅ | Git Bash / MSYS2 |
+| bix-utils → audit | ✅ | ✅ | ✅ | ✅ |
+| bix-utils → rewrite | ✅ | ✅ | ✅ | ✅ |
+| bix-utils → cleanup | ✅ | ✅ | ✅ | Git Bash / MSYS2 / Cygwin |
 
 ## License
 
