@@ -13,7 +13,7 @@
       "name": "bix",
       "source": "./plugins/bix",
       "description": "A collection of useful Claude Code skills for everyday productivity",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "utilities",
       "tags": ["cleanup", "disk-space", "maintenance", "productivity", "github", "pull-request", "pr-description", "pr-review", "pr-resolve", "code-review", "security", "audit", "session", "context", "load-session"],
       "license": "Apache-2.0"
