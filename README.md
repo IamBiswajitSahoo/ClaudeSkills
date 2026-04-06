@@ -14,16 +14,21 @@ A collection of useful Claude Code skills, distributed as a plugin marketplace.
 
 These skills are intentionally designed to be **token-efficient** — pushing context-heavy work into deterministic scripts and focused sub-agents instead of bloating the main conversation — and to **keep a human in the loop** wherever a decision matters (review approval, fix triage, destructive cleanup, prompt rewrites, session loading).
 
-## Installation
+## Installation & Usage
+
+1. Add the marketplace.
 
 ```
 /plugin marketplace add IamBiswajitSahoo/ClaudeSkills
+```
+2. Install only the plugins you need. 
+
+```
 /plugin install bix-github@Biswajit-Claude-Skills
 /plugin install bix-session@Biswajit-Claude-Skills
 /plugin install bix-utils@Biswajit-Claude-Skills
 ```
-
-Install only the plugins you need. Once installed, skills can be invoked by name (e.g. `/audit`, `/github-pr-review`, `/load-session`, `/rewrite`) or by full prefix (e.g. `/bix-utils:audit`, `/bix-github:github-pr-review`, `/bix-session:load-session`).
+3. Once installed, skills can be invoked by name (e.g. `/audit`, `/github-pr-review`, `/load-session`, `/rewrite`) or by full prefix (e.g. `/bix-utils:audit`, `/bix-github:github-pr-review`, `/bix-session:load-session`).
 
 ## Available Skills
 
