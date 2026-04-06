@@ -1,0 +1,18 @@
+{
+  "name": "bix-utils",
+  "version": "1.2.0",
+  "description": "Everyday productivity skills — security audit, ~/.claude cleanup, and prompt rewriting via curated frameworks.",
+  "author": {
+    "name": "Biswajit Sahoo"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "utilities",
+    "cleanup",
+    "audit",
+    "security",
+    "rewrite",
+    "prompt-engineering",
+    "maintenance"
+  ]
+}

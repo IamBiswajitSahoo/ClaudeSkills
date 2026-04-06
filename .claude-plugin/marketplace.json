@@ -5,17 +5,73 @@
   },
   "metadata": {
     "description": "A collection of useful Claude Code skills that I use in my work daily.",
-    "version": "1.0.0",
+    "version": "1.2.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
+      "name": "bix-github",
+      "source": "./plugins/bix-github",
+      "description": "GitHub PR workflow skills — describe, review (with optional parallel agents), and resolve review comments.",
+      "version": "1.2.0",
+      "category": "github",
+      "tags": [
+        "github",
+        "pull-request",
+        "pr-describe",
+        "pr-review",
+        "pr-resolve",
+        "code-review"
+      ],
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "bix-session",
+      "source": "./plugins/bix-session",
+      "description": "Load context from a previous Claude Code session into the current one — compact summary or full transcript, with smart template auto-selection.",
+      "version": "1.2.0",
+      "category": "productivity",
+      "tags": [
+        "session",
+        "context",
+        "load-session",
+        "resume",
+        "summary"
+      ],
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "bix-utils",
+      "source": "./plugins/bix-utils",
+      "description": "Everyday productivity skills — security audit, ~/.claude cleanup, and prompt rewriting via curated frameworks.",
+      "version": "1.2.0",
+      "category": "utilities",
+      "tags": [
+        "utilities",
+        "cleanup",
+        "audit",
+        "security",
+        "rewrite",
+        "prompt-engineering",
+        "maintenance"
+      ],
+      "license": "Apache-2.0"
+    },
+    {
       "name": "bix",
       "source": "./plugins/bix",
-      "description": "A collection of useful Claude Code skills for everyday productivity",
-      "version": "1.1.4",
+      "description": "[DEPRECATED — install bix-github, bix-session, and/or bix-utils instead] A collection of useful Claude Code skills for everyday productivity.",
+      "version": "1.2.0",
       "category": "utilities",
-      "tags": ["cleanup", "disk-space", "maintenance", "productivity", "github", "pull-request", "pr-description", "pr-review", "pr-resolve", "code-review", "security", "audit", "session", "context", "load-session"],
+      "tags": [
+        "deprecated",
+        "cleanup",
+        "github",
+        "pr-review",
+        "session",
+        "audit",
+        "rewrite"
+      ],
       "license": "Apache-2.0"
     }
   ]
