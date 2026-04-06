@@ -35,7 +35,7 @@ The skill walks you through framework selection interactively — no flags or op
                           ▼
 ┌──────────────────────────────────────────────────────┐
 │ Step 3: Pick a framework within that category        │
-│   e.g. RISEN, TIDD-EC, CO-STAR, etc.                │
+│   e.g. RISEN, TIDD-EC, CO-STAR, etc.                 │
 └─────────────────────────┬────────────────────────────┘
                           ▼
 ┌──────────────────────────────────────────────────────┐
