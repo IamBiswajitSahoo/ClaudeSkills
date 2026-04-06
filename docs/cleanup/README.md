@@ -6,11 +6,11 @@ Scan and clean up Claude Code's internal data (`~/.claude/`) to reclaim disk spa
 
 ## Installation
 
-First, add the marketplace and install the `bix` plugin:
+First, add the marketplace and install the `bix-utils` plugin:
 
 ```
 /plugin marketplace add IamBiswajitSahoo/ClaudeSkills
-/plugin install bix@Biswajit-Claude-Skills
+/plugin install bix-utils@Biswajit-Claude-Skills
 ```
 
 ## Usage

@@ -6,11 +6,11 @@ Review GitHub pull requests — drafts findings across 5 categories with severit
 
 ## Installation
 
-First, add the marketplace and install the `bix` plugin:
+First, add the marketplace and install the `bix-github` plugin:
 
 ```
 /plugin marketplace add IamBiswajitSahoo/ClaudeSkills
-/plugin install bix@Biswajit-Claude-Skills
+/plugin install bix-github@Biswajit-Claude-Skills
 ```
 
 ## Usage

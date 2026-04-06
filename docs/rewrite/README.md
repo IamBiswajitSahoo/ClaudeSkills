@@ -1,6 +1,6 @@
 # /rewrite
 
-> Also available as `/bix:rewrite`
+> Also available as `/bix-utils:rewrite`
 
 Rewrite your prompts using proven prompt engineering frameworks. Pick a framework, and a fast sub-agent restructures your prompt into a clear, structured version optimized for LLM comprehension.
 
@@ -8,7 +8,7 @@ Rewrite your prompts using proven prompt engineering frameworks. Pick a framewor
 
 ```bash
 /plugin marketplace add IamBiswajitSahoo/ClaudeSkills
-/plugin install bix@Biswajit-Claude-Skills
+/plugin install bix-utils@Biswajit-Claude-Skills
 ```
 
 ## Usage
@@ -109,7 +109,7 @@ Not sure which framework to pick? Here's a quick guide:
 
 ## Inspiration & References
 
-This skill was inspired by the open-source **[Prompt Architect](https://github.com/ckelsoe/claude-skill-prompt-architect)** skill by Charles Kelsoe, which implements 27 prompt engineering frameworks with intent-based routing. We adapted the concept to the bix plugin conventions — using a haiku sub-agent for fast rewriting, a 2-step category-based selection UX, and a curated set of 12 frameworks instead of the full 27.
+This skill was inspired by the open-source **[Prompt Architect](https://github.com/ckelsoe/claude-skill-prompt-architect)** skill by Charles Kelsoe, which implements 27 prompt engineering frameworks with intent-based routing. We adapted the concept for this marketplace — using a haiku sub-agent for fast rewriting, a 2-step category-based selection UX, and a curated set of 12 frameworks instead of the full 27.
 
 The frameworks themselves come from various sources in the prompt engineering community:
 

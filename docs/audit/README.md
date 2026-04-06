@@ -1,16 +1,16 @@
 # /audit
 
-> Also available as `/bix:audit`
+> Also available as `/bix-utils:audit`
 
 Security audit for Claude Code extension surfaces — skills, MCP servers, hooks, and CLAUDE.md files. Runs a fast regex-based pattern scan first, then spawns parallel deep-analysis agents for semantic review.
 
 ## Installation
 
-First, add the marketplace and install the `bix` plugin:
+First, add the marketplace and install the `bix-utils` plugin:
 
 ```bash
 /plugin marketplace add IamBiswajitSahoo/ClaudeSkills
-/plugin install bix@Biswajit-Claude-Skills
+/plugin install bix-utils@Biswajit-Claude-Skills
 ```
 
 ## Usage
@@ -112,7 +112,7 @@ The skill is designed to be cost-effective even for large audit targets:
 
 ## Audit Modes
 
-### Skill Audit (`/bix:audit skill <path>`)
+### Skill Audit (`/bix-utils:audit skill <path>`)
 
 Audits a skill directory before installation. Checks:
 
@@ -122,7 +122,7 @@ Audits a skill directory before installation. Checks:
 - Frontmatter for overly permissive tool access
 - URLs and env var references for data exfiltration
 
-### MCP Server Audit (`/bix:audit mcp`)
+### MCP Server Audit (`/bix-utils:audit mcp`)
 
 Audits configured MCP server definitions. Checks:
 
@@ -132,7 +132,7 @@ Audits configured MCP server definitions. Checks:
 - Permission scope (overly broad filesystem/API access)
 - Tool description injection vectors
 
-### Hooks Audit (`/bix:audit hooks`)
+### Hooks Audit (`/bix-utils:audit hooks`)
 
 Audits Claude Code hooks in settings.json. Checks:
 
@@ -141,7 +141,7 @@ Audits Claude Code hooks in settings.json. Checks:
 - Data flow (can the hook capture and exfiltrate tool I/O?)
 - Scope risk (global hooks have higher blast radius than project hooks)
 
-### CLAUDE.md Audit (`/bix:audit claudemd`)
+### CLAUDE.md Audit (`/bix-utils:audit claudemd`)
 
 Audits CLAUDE.md files for prompt injection. Checks:
 

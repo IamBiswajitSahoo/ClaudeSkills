@@ -6,11 +6,11 @@ Generate a well-structured PR description by analyzing the diff between the PR b
 
 ## Installation
 
-First, add the marketplace and install the `bix` plugin:
+First, add the marketplace and install the `bix-github` plugin:
 
 ```
 /plugin marketplace add IamBiswajitSahoo/ClaudeSkills
-/plugin install bix@Biswajit-Claude-Skills
+/plugin install bix-github@Biswajit-Claude-Skills
 ```
 
 ## Usage

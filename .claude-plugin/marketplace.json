@@ -56,23 +56,6 @@
         "maintenance"
       ],
       "license": "Apache-2.0"
-    },
-    {
-      "name": "bix",
-      "source": "./plugins/bix",
-      "description": "[DEPRECATED — install bix-github, bix-session, and/or bix-utils instead] A collection of useful Claude Code skills for everyday productivity.",
-      "version": "1.2.0",
-      "category": "utilities",
-      "tags": [
-        "deprecated",
-        "cleanup",
-        "github",
-        "pr-review",
-        "session",
-        "audit",
-        "rewrite"
-      ],
-      "license": "Apache-2.0"
     }
   ]
 }

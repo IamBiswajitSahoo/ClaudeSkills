@@ -1,6 +1,6 @@
 # /load-session
 
-> Also available as `/bix:load-session`
+> Also available as `/bix-session:load-session`
 
 Load context from a previous Claude Code session into your current conversation. Browse your sessions, pick one, and choose between a compact AI summary or the full transcript.
 
@@ -8,7 +8,7 @@ Load context from a previous Claude Code session into your current conversation.
 
 ```bash
 /plugin marketplace add IamBiswajitSahoo/ClaudeSkills
-/plugin install bix@Biswajit-Claude-Skills
+/plugin install bix-session@Biswajit-Claude-Skills
 ```
 
 ## Usage

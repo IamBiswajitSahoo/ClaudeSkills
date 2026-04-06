@@ -8,12 +8,12 @@ A collection of useful Claude Code skills, distributed as a plugin marketplace.
 
 ```
 /plugin marketplace add IamBiswajitSahoo/ClaudeSkills
-/plugin install bix@Biswajit-Claude-Skills
+/plugin install bix-github@Biswajit-Claude-Skills
+/plugin install bix-session@Biswajit-Claude-Skills
+/plugin install bix-utils@Biswajit-Claude-Skills
 ```
 
-Once installed, skills can be invoked in two ways:
-- By skill name: `/audit`, `/cleanup`, `/github-pr-review`, `/rewrite` (shows as `(bix)` in autocomplete)
-- By full prefix: `/bix:audit`, `/bix:cleanup`, `/bix:github-pr-review`, `/bix:rewrite`
+Install only the plugins you need. Once installed, skills can be invoked by name (e.g. `/audit`, `/github-pr-review`, `/load-session`, `/rewrite`) or by full prefix (e.g. `/bix-utils:audit`, `/bix-github:github-pr-review`, `/bix-session:load-session`).
 
 ## Available Skills
 
