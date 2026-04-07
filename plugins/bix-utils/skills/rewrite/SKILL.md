@@ -1,6 +1,6 @@
 ---
 name: rewrite
-description: Rewrite prompts using proven prompt engineering frameworks — select from 12 curated frameworks or provide a custom template, then get a structured rewrite via a fast sub-agent.
+description: Rewrite prompts using proven prompt engineering frameworks — select from 20 curated frameworks or provide a custom template, then get a structured rewrite via a fast sub-agent.
 metadata:
   author: Biswajit Sahoo (https://github.com/IamBiswajitSahoo)
   license: Apache-2.0
@@ -46,7 +46,9 @@ Present via `AskUserQuestion`:
 | 1 | **Essential (Recommended)** | RISEN, TIDD-EC, CRAFT, APE — covers 80% of tasks |
 | 2 | **Specialized** | CO-STAR, K.E.R.N.E.L., BAB, Chain of Thought — audience, validation, transformation, reasoning |
 | 3 | **Advanced** | RACE, CRISPE, SCRIBE, C.R.E.A.T.E. — niche and creative frameworks |
-| 4 | **Custom / Skip** | Provide your own template or use the prompt as-is |
+| 4 | **Reasoning** | Tree-of-Thought, Plan-and-Solve, Self-Refine, Skeleton-of-Thought — multi-step reasoning and structured generation |
+| 5 | **Quick & Clarify** | RTF, Step-Back, Chain-of-Density, Reverse-Role — minimal scaffolds, abstraction, dense summaries, requirement elicitation |
+| 6 | **Custom / Skip** | Provide your own template or use the prompt as-is |
 
 ### Step 2 — Pick a framework
 
@@ -81,6 +83,26 @@ Based on the category selected, present a second `AskUserQuestion`:
 | 2 | **CRISPE** | Capacity, Insight, Statement, Personality, Experiment — multiple output variants |
 | 3 | **SCRIBE** | Specify role, Contextualize, Responsibility, Instructions, Banter, Evaluate — iterative dialogue |
 | 4 | **C.R.E.A.T.E.** | Character, Request, Examples, Adjustments, Type of output, Extras — content with style control |
+
+**If Reasoning:**
+> "Select a framework:"
+
+| Option | Label | Description |
+|--------|-------|-------------|
+| 1 | **Tree-of-Thought** | Generate multiple solution branches, evaluate against criteria, pick the winner — for problems with several valid paths |
+| 2 | **Plan-and-Solve** | Devise an explicit numbered plan first, then execute and verify — for multi-step problems where order matters |
+| 3 | **Self-Refine** | Draft → critique against a rubric → revise — for quality-sensitive single-shot tasks |
+| 4 | **Skeleton-of-Thought** | Outline 3–7 points first, then expand each into the target length — for long structured outputs |
+
+**If Quick & Clarify:**
+> "Select a framework:"
+
+| Option | Label | Description |
+|--------|-------|-------------|
+| 1 | **RTF** | Role · Task · Format — the minimum viable scaffold for quick "give me X in format Y" requests |
+| 2 | **Step-Back** | Ask a more abstract question first to recall the principle, then apply it to the specific question |
+| 3 | **Chain-of-Density** | Iteratively pack more entities into a fixed-length summary — for dense, high-coverage summaries |
+| 4 | **Reverse-Role** | The model interviews *you* with clarifying questions before producing — for vague or open-ended requests |
 
 **If Custom / Skip:**
 > "How would you like to proceed?"
@@ -132,6 +154,14 @@ Where `{framework_key}` is the lowercase key mapped from the selection:
 | CRISPE | `crispe` |
 | SCRIBE | `scribe` |
 | C.R.E.A.T.E. | `create` |
+| Tree-of-Thought | `tree-of-thought` |
+| Plan-and-Solve | `plan-and-solve` |
+| Self-Refine | `self-refine` |
+| Skeleton-of-Thought | `skeleton-of-thought` |
+| RTF | `rtf` |
+| Step-Back | `step-back` |
+| Chain-of-Density | `chain-of-density` |
+| Reverse-Role | `reverse-role` |
 
 Store the template text for use in Phase 3.
 
