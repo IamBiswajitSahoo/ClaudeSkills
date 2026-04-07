@@ -19,6 +19,8 @@ First, add the marketplace and install the `bix-github` plugin:
 | `/bix-github:github-pr-review 42 -parallel` | Reviews PR #42 with 5+1 parallel agents |
 | `/bix-github:github-pr-review` | Prompts for a PR number, then reviews |
 
+For large diffs (more than 3000 lines), the skill asks whether to run in parallel or single-agent mode even without the `-parallel` flag.
+
 ## Features
 
 - 5 evaluation categories: Code Correctness, Project Conventions, Performance, Security, Test Coverage

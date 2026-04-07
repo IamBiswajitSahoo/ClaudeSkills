@@ -1,6 +1,6 @@
 # /bix-utils:rewrite
 
-Rewrite your prompts using proven prompt engineering frameworks. Pick a framework, and a fast sub-agent restructures your prompt into a clear, structured version optimized for LLM comprehension.
+Rewrite your prompts using proven prompt engineering frameworks. A fast sub-agent recommends the best-fit framework for your prompt, and another sub-agent restructures it into a clear, LLM-optimized version.
 
 ## Installation
 
@@ -13,31 +13,31 @@ Rewrite your prompts using proven prompt engineering frameworks. Pick a framewor
 
 | Command | What It Does |
 | ------- | ------------ |
-| `/bix-utils:rewrite "Build a REST API for user management"` | Rewrite the prompt using a selected framework |
+| `/bix-utils:rewrite "Build a REST API for user management"` | Rewrite the prompt using a recommended framework |
 | `/bix-utils:rewrite` | Interactive mode — prompts you to type or paste your prompt |
 
 The skill walks you through framework selection interactively — no flags or options to memorize.
 
 ## How It Works
 
-```
+```text
 ┌──────────────────────────────────────────────────────┐
 │ Step 1: You provide your raw prompt                  │
-│   /bix-utils:rewrite "your prompt here"                        │
+│   /bix-utils:rewrite "your prompt here"              │
 └─────────────────────────┬────────────────────────────┘
                           ▼
 ┌──────────────────────────────────────────────────────┐
-│ Step 2: Pick a category                              │
-│   Essential · Specialized · Advanced · Custom/Skip   │
+│ Step 2: Recommender sub-agent suggests a framework   │
+│   Accept · Use runner-up · Browse · Custom/Skip      │
 └─────────────────────────┬────────────────────────────┘
                           ▼
 ┌──────────────────────────────────────────────────────┐
-│ Step 3: Pick a framework within that category        │
-│   e.g. RISEN, TIDD-EC, CO-STAR, etc.                 │
+│ Step 3 (optional): Browse 20 frameworks by category  │
+│   Core · Content · Reasoning · Expert · Quick        │
 └─────────────────────────┬────────────────────────────┘
                           ▼
 ┌──────────────────────────────────────────────────────┐
-│ Step 4: Haiku sub-agent rewrites your prompt         │
+│ Step 4: Haiku rewriter sub-agent transforms prompt   │
 │   Fast, cheap — pure text transformation             │
 └─────────────────────────┬────────────────────────────┘
                           ▼
@@ -47,87 +47,76 @@ The skill walks you through framework selection interactively — no flags or op
 └──────────────────────────────────────────────────────┘
 ```
 
+Happy path is **one question**: accept the recommendation. Browse mode costs two questions (category → framework).
+
 ## Frameworks
 
-The skill includes 12 curated frameworks organized into three categories.
+The skill includes 20 curated frameworks organized into five categories.
 
-### Essential — covers 80% of tasks
-
-| Framework | Stands For | Best For |
-| --------- | ---------- | -------- |
-| **RISEN** | **R**ole, **I**nstructions, **S**teps, **E**nd goal, **N**arrowing | Structured multi-step tasks, complex implementations, detailed reports |
-| **TIDD-EC** | **T**ask, **I**nstructions, **D**o, **D**on't, **E**xamples, **C**ontext | Code generation, precision tasks, anything with strict requirements |
-| **CRAFT** | **C**ontext, **R**ole, **A**ction, **F**ormat, **T**one | General-purpose prompt writing, everyday tasks |
-| **APE** | **A**ction, **P**urpose, **E**xpectation | Quick one-off tasks where minimal structure is sufficient |
-
-### Specialized — audience, validation, transformation, reasoning
+### Core Structured — general-purpose scaffolds, 80% of tasks
 
 | Framework | Stands For | Best For |
 | --------- | ---------- | -------- |
-| **CO-STAR** | **C**ontext, **O**bjective, **S**tyle, **T**one, **A**udience, **R**esponse | Content creation, writing, communications — anything where audience and tone matter |
-| **K.E.R.N.E.L.** | **K**eep simple, **E**asy to verify, **R**eproducible, **N**arrow scope, **E**xplicit constraints, **L**ogical structure | Meta-validation — refines any prompt by applying a quality checklist rather than imposing new structure |
-| **BAB** | **B**efore, **A**fter, **B**ridge | Transformation tasks — refactoring, migration, upgrading, rewriting |
-| **Chain of Thought** | Problem, Reasoning, Sub-questions, Verification, Answer | Reasoning, analysis, debugging, problem-solving — tasks where step-by-step thinking improves quality |
+| **RISEN** | **R**ole, **I**nstructions, **S**teps, **E**nd goal, **N**arrowing | Multi-step structured work, complex implementations — safe default |
+| **TIDD-EC** | **T**ask, **I**nstructions, **D**o, **D**on't, **E**xamples, **C**ontext | Code generation and precision tasks with strict do/don't rules |
+| **CRAFT** | **C**ontext, **R**ole, **A**ction, **F**ormat, **T**one | General-purpose prompts where tone and format matter |
+| **APE** | **A**ction, **P**urpose, **E**xpectation | Minimal 3-part scaffold for quick one-offs |
 
-### Advanced — niche and creative
+### Content & Communication — audience, validation, transformation
 
 | Framework | Stands For | Best For |
 | --------- | ---------- | -------- |
-| **RACE** | **R**ole, **A**ction, **C**ontext, **E**xpectation | Fast expert-driven tasks, lighter alternative to RISEN |
-| **CRISPE** | **C**apacity, **I**nsight, **S**tatement, **P**ersonality, **E**xperiment | A/B testing, generating multiple variants, creative exploration |
-| **SCRIBE** | **S**pecify role, **C**ontextualize, **R**esponsibility, **I**nstructions, **B**anter, **E**valuate | Iterative conversational workflows, tasks that benefit from back-and-forth dialogue |
-| **C.R.E.A.T.E.** | **C**haracter, **R**equest, **E**xamples, **A**djustments, **T**ype of output, **E**xtras | Content generation with fine control over style, format, and examples |
+| **CO-STAR** | **C**ontext, **O**bjective, **S**tyle, **T**one, **A**udience, **R**esponse | Audience-sensitive writing — emails, pitches, posts |
+| **K.E.R.N.E.L.** | **K**eep simple, **E**asy to verify, **R**eproducible, **N**arrow, **E**xplicit, **L**ogical | Meta-validation — polishing an existing prompt with a quality checklist |
+| **BAB** | **B**efore, **A**fter, **B**ridge | Transformations — refactoring, migration, upgrades, rewriting |
+
+### Reasoning — analysis, planning, iterative quality
+
+| Framework | Origin | Best For |
+| --------- | ------ | -------- |
+| **Chain of Thought** | Wei et al., 2022 | Step-by-step reasoning, debugging, root-cause analysis |
+| **Tree-of-Thought** | Yao et al., 2023 | Exploring multiple solution branches and picking a winner |
+| **Plan-and-Solve** | Wang et al., 2023 | Produce a numbered plan, then execute it — when order matters |
+| **Self-Refine** | Madaan et al., 2023 | Draft → critique → revise loop for quality-sensitive outputs |
+| **Skeleton-of-Thought** | Ning et al., 2023 | Outline first, then expand — long, structured outputs |
+
+### Expert & Creative — personas, variants, dialogue, creative
+
+| Framework | Stands For | Best For |
+| --------- | ---------- | -------- |
+| **RACE** | **R**ole, **A**ction, **C**ontext, **E**xpectation | Fast expert-persona tasks — a lighter RISEN |
+| **CRISPE** | **C**apacity, **I**nsight, **S**tatement, **P**ersonality, **E**xperiment | A/B testing, multiple variants, creative exploration |
+| **SCRIBE** | **S**pecify, **C**ontextualize, **R**esponsibility, **I**nstructions, **B**anter, **E**valuate | Iterative, conversational, interview-style workflows |
+| **C.R.E.A.T.E.** | **C**haracter, **R**equest, **E**xamples, **A**djustments, **T**ype, **E**xtras | Creative content with tight style and format control |
+
+### Quick & Clarify — minimum scaffolds and clarifying moves
+
+| Framework | Best For |
+| --------- | -------- |
+| **RTF** (Role · Task · Format) | The smallest useful scaffold — when you just need a shape |
+| **Step-Back** | Abstract the underlying principle first, then apply it |
+| **Chain-of-Density** | Dense, entity-rich summaries of long documents |
+| **Reverse-Role** | Let the model interview *you* — great for vague requests |
 
 ### Custom / Skip
 
 You can also:
+
 - **Provide your own template** — give a file path (`.md`, `.txt`) or paste raw template text directly
 - **Skip rewriting** — pass the prompt through as-is
 
-## Choosing a Framework
-
-Not sure which framework to pick? Here's a quick guide:
-
-| Your Situation | Recommended Framework |
-| -------------- | --------------------- |
-| Building or implementing something step-by-step | **RISEN** |
-| Writing code with specific do's and don'ts | **TIDD-EC** |
-| General task, just want it clearer | **CRAFT** |
-| Simple ask, don't need much structure | **APE** |
-| Writing for a specific audience or tone | **CO-STAR** |
-| Prompt already exists, just needs polish | **K.E.R.N.E.L.** |
-| Refactoring or migrating from A to B | **BAB** |
-| Complex reasoning or debugging | **Chain of Thought** |
-
 ## Token Efficiency
 
-- **Sub-agent uses Haiku** — the rewriting is a text transformation task, not deep analysis, so it uses the fastest and cheapest model available
-- **No tools needed** — the sub-agent has zero tool access (pure text in, text out), minimizing overhead
-- **2-step selection** — category then framework, always exactly 2 questions, no deep pagination chains
+- **Haiku sub-agents** — both the recommender and the rewriter run on Haiku for speed and low cost
+- **Catalog isolation** — the 20-framework catalog lives inside the recommender sub-agent, never entering the main-session context
+- **1-question happy path** — accept the recommendation and you're done; browse mode is only 2 questions
 
 ## Inspiration & References
 
-This skill was inspired by the open-source **[Prompt Architect](https://github.com/ckelsoe/claude-skill-prompt-architect)** skill by Charles Kelsoe, which implements 27 prompt engineering frameworks with intent-based routing. We adapted the concept for this marketplace — using a haiku sub-agent for fast rewriting, a 2-step category-based selection UX, and a curated set of 12 frameworks instead of the full 27.
+This skill was inspired by the open-source **[Prompt Architect](https://github.com/ckelsoe/claude-skill-prompt-architect)** skill by Charles Kelsoe. We adapted the concept for this marketplace — using Haiku sub-agents for recommendation and rewriting, a recommend-first UX, and a curated set of 20 frameworks spanning classic scaffolds and modern reasoning techniques.
 
-The frameworks themselves come from various sources in the prompt engineering community:
-
-| Framework | Origin |
-| --------- | ------ |
-| RISEN | [AiPromptsX](https://aipromptsx.com/blog/risen-framework-prompt-engineering-guide), [Easy AI Beginner](https://easyaibeginner.com/risen-framework-ai-prompt-for-chatgpt/) |
-| CO-STAR | Winner of Singapore's first GPT-4 Prompt Engineering competition ([Parloa](https://www.parloa.com/knowledge-hub/prompt-engineering-frameworks/)) |
-| TIDD-EC | [Medium — CO-STAR and TIDD-EC](https://vivasai01.medium.com/mastering-prompt-engineering-a-guide-to-the-co-star-and-tidd-ec-frameworks-3334588cb908) |
-| CRAFT | [Geeky Gadgets](https://www.geeky-gadgets.com/craft-prompt-framework/), [Monica Poling](https://monicapoling.com/the-craft-prompt-framework-for-better-ai-results/) |
-| APE | [AiPromptsX — Frameworks](https://aipromptsx.com/prompts/frameworks) |
-| K.E.R.N.E.L. | [CyberCorsairs](https://cybercorsairs.com/the-kernel-prompting-framework/), [Medium — KERNEL Formula](https://nurxmedov.medium.com/stop-guessing-your-ai-prompts-use-this-6-step-k-e-r-n-e-l-formula-6e0953b846e0) |
-| BAB | [AiPromptsX](https://aipromptsx.com/prompts/frameworks), [Parloa](https://www.parloa.com/knowledge-hub/prompt-engineering-frameworks/) |
-| Chain of Thought | [Wei et al., 2022](https://arxiv.org/abs/2201.11903) — the foundational paper on chain-of-thought prompting |
-| RACE | [Parloa](https://www.parloa.com/knowledge-hub/prompt-engineering-frameworks/) |
-| CRISPE | [Medium — CRISPE](https://sourcingdenis.medium.com/crispe-prompt-engineering-framework-e47eaaf83611) |
-| SCRIBE | [Synaptic Labs](https://blog.synapticlabs.ai/unleash-your-chatgpts-potential-with-the-scribe-method) |
-| C.R.E.A.T.E. | [AI Monks](https://medium.com/aimonks/chatgpt-power-prompts-cheatsheet-c-r-e-a-t-e-framework-for-prompting-b852b2b9b248), developed by AI consultant Dave Birss |
-
-The initial framework research was also informed by a Reddit post on [r/PromptEngineering](https://www.reddit.com/r/PromptEngineering/comments/1nt7x7v/after_1000_hours_of_prompt_engineering_i_found/) discussing real-world framework effectiveness.
+Framework sources include [AiPromptsX](https://aipromptsx.com/prompts/frameworks), [Parloa](https://www.parloa.com/knowledge-hub/prompt-engineering-frameworks/), [Synaptic Labs](https://blog.synapticlabs.ai/unleash-your-chatgpts-potential-with-the-scribe-method), and foundational papers: [Chain of Thought (Wei et al., 2022)](https://arxiv.org/abs/2201.11903), [Tree of Thoughts (Yao et al., 2023)](https://arxiv.org/abs/2305.10601), [Plan-and-Solve (Wang et al., 2023)](https://arxiv.org/abs/2305.04091), [Self-Refine (Madaan et al., 2023)](https://arxiv.org/abs/2303.17651), and [Skeleton-of-Thought (Ning et al., 2023)](https://arxiv.org/abs/2307.15337).
 
 ## Requirements
 
-- No external dependencies — the skill uses only Claude Code's built-in tools and a haiku sub-agent
+- No external dependencies — the skill uses only Claude Code's built-in tools and Haiku sub-agents
