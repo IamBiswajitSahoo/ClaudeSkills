@@ -35,6 +35,14 @@ First, add the marketplace and install the `bix-github` plugin:
 - `python3` available
 - Must be run from within a git repo with a GitHub remote
 
+## Scripts
+
+Scripts the skill executes on your machine. Provided for transparency so you can verify nothing unexpected runs.
+
+| Script | Purpose | Tools / Calls | Network | Writes |
+|---|---|---|---|---|
+| `scripts/gather-pr-info.sh` | Fetch PR metadata + diff and emit JSON | `gh`, `jq` | Only via `gh` (GitHub API) | stdout only |
+
 ## Workflow
 
 1. **Gather** — validates input, fetches PR metadata and diff as JSON

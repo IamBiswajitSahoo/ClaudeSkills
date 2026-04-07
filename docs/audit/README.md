@@ -173,6 +173,20 @@ Audits CLAUDE.md files for prompt injection. Checks:
 | Structural         | 3        | Excessive tool permissions, unrestricted bash, file write access               |
 | Informational      | 3        | Env var reads, path traversal, subprocess spawning                             |
 
+## Scripts
+
+Scripts the skill executes on your machine. Provided for transparency — since this is a security tool, you should be able to verify exactly what it does. All are pure Python 3 (standard library only) and read-only against your filesystem except `resolve-target.py`, which writes to a temp dir when fetching remote audit targets.
+
+| Script | Purpose | Tools / Calls | Network | Writes |
+|---|---|---|---|---|
+| `scripts/pattern-scan.py` | Regex-scan a directory for known malicious patterns; emit JSON findings + risk score | `os.walk`, `open`, `re` (stdlib only) | None | stdout only |
+| `scripts/gather-skill-inventory.py` | Walk a skill dir, parse SKILL.md frontmatter, list files, flag binaries/scripts/URLs | `os.walk`, `open`, `re` (stdlib only) | None | stdout only |
+| `scripts/gather-mcp-config.py` | Read configured MCP servers from Claude Code settings files; emit JSON | `open` on `~/.claude/`, `~/.claude.json`, `.mcp.json` | None | stdout only |
+| `scripts/gather-hooks-config.py` | Read hooks from Claude Code settings files; emit JSON with security metadata | `open` on `~/.claude/settings.json` and project settings | None | stdout only |
+| `scripts/resolve-target.py` | Resolve a local path / GitHub URL / npm package to a local dir for auditing | `subprocess.run([...])` (arg list, no shell) calling `git clone --depth 1` or `npm pack` | Only via `git` / `npm` to user-supplied target | Temp dir under `tempfile.mkdtemp()` |
+
+> **Note on `pattern-scan.py` self-flagging:** because it contains regex strings for every malicious pattern it detects (reverse shells, credential paths, etc.), running the audit on the audit tool itself produces many "Critical" matches against its own `PATTERNS` list. Those strings are detector signatures, not executable code — see the docstring at the top of the file for details.
+
 ### Operating Systems Compatibility
 
 | OS      | Status | Notes                                                    |

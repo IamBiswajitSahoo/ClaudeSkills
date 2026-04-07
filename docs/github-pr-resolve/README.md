@@ -36,6 +36,14 @@ First, add the marketplace and install the `bix-github` plugin:
 - `python3` available
 - Must be run from within a git repo with a GitHub remote
 
+## Scripts
+
+Scripts the skill executes on your machine. Provided for transparency so you can verify nothing unexpected runs.
+
+| Script | Purpose | Tools / Calls | Network | Writes |
+|---|---|---|---|---|
+| `scripts/gather-pr-comments.sh` | Fetch inline + review comments and group reply chains into threads | `gh`, `jq` | Only via `gh` (GitHub API) | stdout only |
+
 ## Workflow
 
 1. **Gather** — validates input, fetches all review feedback (inline comments + review bodies + threading)
