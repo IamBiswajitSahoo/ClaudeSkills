@@ -4,10 +4,7 @@
 
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-supported-D97757)](https://docs.claude.com/en/docs/claude-code/overview)
 [![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FIamBiswajitSahoo%2FClaudeSkills%2Fmain%2F.claude-plugin%2Fmarketplace.json&query=%24.metadata.version&label=version&color=blue)](https://github.com/IamBiswajitSahoo/ClaudeSkills/blob/main/VERSION)
-[![macOS](https://img.shields.io/badge/macOS-supported-brightgreen?logo=apple&logoColor=white)](#os-support)
-[![Linux](https://img.shields.io/badge/Linux-supported-brightgreen?logo=linux&logoColor=white)](#os-support)
-[![WSL](https://img.shields.io/badge/WSL-supported-brightgreen?logo=windows&logoColor=white)](#os-support)
-[![Windows](https://img.shields.io/badge/Windows-Git%20Bash%20%2F%20MSYS2-yellow?logo=windows&logoColor=white)](#os-support)
+[![License](https://img.shields.io/github/license/IamBiswajitSahoo/ClaudeSkills?color=blue)](https://github.com/IamBiswajitSahoo/ClaudeSkills/blob/main/LICENSE)
 [![Stars](https://img.shields.io/github/stars/IamBiswajitSahoo/ClaudeSkills?style=social)](https://github.com/IamBiswajitSahoo/ClaudeSkills/stargazers)
 
 A collection of useful Claude Code skills, distributed as a plugin marketplace.
