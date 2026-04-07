@@ -1,6 +1,6 @@
 {
   "name": "bix-utils",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Everyday productivity skills — security audit, ~/.claude cleanup, and prompt rewriting via curated frameworks.",
   "author": {
     "name": "Biswajit Sahoo"
