@@ -5,6 +5,11 @@
 
 set -euo pipefail
 
+# Load shared classification
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=classify.sh
+. "$SCRIPT_DIR/classify.sh"
+
 # Determine ~/.claude/ path
 CLAUDE_DIR="${HOME}/.claude"
 
@@ -151,29 +156,47 @@ total=$(get_size_bytes "$CLAUDE_DIR")
 echo "  \"total_bytes\": $total,"
 echo "  \"total_human\": \"$(fmt_size "$total")\","
 
-# Scan each directory
-echo "  \"directories\": ["
-
-first=true
+# Scan each directory (sorted by size desc for table output)
+# First pass: collect name:size pairs
+DIR_ROWS=""
 for dir in "$CLAUDE_DIR"/*/; do
   [ -d "$dir" ] || continue
-  dirname=$(basename "$dir")
+  dname=$(basename "$dir")
   size=$(get_size_bytes "$dir")
-
-  if [ "$first" = true ]; then
-    first=false
-  else
-    echo "    ,"
-  fi
-
-  echo "    {"
-  echo "      \"name\": \"$dirname\","
-  echo "      \"path\": \"$dir\","
-  echo "      \"bytes\": $size,"
-  echo "      \"human\": \"$(fmt_size "$size")\""
-  echo -n "    }"
+  DIR_ROWS="${DIR_ROWS}${size}|${dname}"$'\n'
 done
+# Sort by size descending
+SORTED_DIRS=$(printf "%s" "$DIR_ROWS" | sort -t'|' -k1,1 -rn)
 
+echo "  \"directories\": ["
+first=true
+SAFE_LIST=""
+MD_ROWS=""
+while IFS='|' read -r size dname; do
+  [ -n "$dname" ] || continue
+  classify_dir "$dname"
+  human=$(fmt_size "$size")
+  case "$CLASSIFY_SAFE" in
+    yes) safe_label="Yes" ;;
+    no)  safe_label="No" ;;
+    *)   safe_label="Unknown" ;;
+  esac
+
+  if [ "$first" = true ]; then first=false; else echo "    ,"; fi
+  echo "    {"
+  echo "      \"name\": \"$dname\","
+  echo "      \"path\": \"$CLAUDE_DIR/$dname/\","
+  echo "      \"bytes\": $size,"
+  echo "      \"human\": \"$human\","
+  echo "      \"description\": \"$CLASSIFY_DESC\","
+  echo "      \"safe_to_delete\": \"$CLASSIFY_SAFE\""
+  echo -n "    }"
+
+  MD_ROWS="${MD_ROWS}| \`${dname}/\` | ${human} | ${CLASSIFY_DESC} | ${safe_label} |"$'\n'
+  if [ "$CLASSIFY_SAFE" = "yes" ]; then
+    SAFE_LIST="${SAFE_LIST}${dname} "
+  fi
+done <<< "$SORTED_DIRS"
 echo ""
 echo "  ],"
 
@@ -244,6 +267,22 @@ for f in "$CLAUDE_DIR"/*; do
   echo -n "    }"
 done
 echo ""
-echo "  ]"
+echo "  ],"
+
+# Safe-to-delete list (for -all mode)
+echo -n "  \"safe_dirs\": ["
+sd_first=true
+for d in $SAFE_LIST; do
+  if [ "$sd_first" = true ]; then sd_first=false; else echo -n ", "; fi
+  echo -n "\"$d\""
+done
+echo "],"
+
+# Pre-rendered markdown table (LLM pastes verbatim — no computation needed)
+# JSON-escape: replace newlines with \n, escape backslashes/quotes
+md_header="| Directory | Size | What it contains | Safe to delete? |\n|-----------|------|------------------|-----------------|\n"
+md_body=$(printf "%s" "$MD_ROWS" | sed 's/\\/\\\\/g; s/"/\\"/g' | awk '{printf "%s\\n", $0}')
+echo "  \"markdown_table\": \"${md_header}${md_body}\","
+echo "  \"active_sessions_note\": \"${active_count} active session(s) detected ($(fmt_size "$active_bytes")) — these will be preserved.\""
 
 echo "}"
