@@ -1,6 +1,4 @@
-# /audit
-
-> Also available as `/bix-utils:audit`
+# /bix-utils:audit
 
 Security audit for Claude Code extension surfaces — skills, MCP servers, hooks, and CLAUDE.md files. Runs a fast regex-based pattern scan first, then spawns parallel deep-analysis agents for semantic review.
 
@@ -17,17 +15,17 @@ First, add the marketplace and install the `bix-utils` plugin:
 
 | Command | Behavior |
 | ------- | -------- |
-| `/audit skill ./path/to/skill` | Audit a local skill directory |
-| `/audit skill https://github.com/user/repo` | Download and audit a skill from GitHub |
-| `/audit skill https://github.com/user/repo/tree/main/skills/foo` | Audit a specific subdirectory in a GitHub repo |
-| `/audit mcp` | Audit all configured MCP servers |
-| `/audit mcp my-server` | Audit a specific configured MCP server |
-| `/audit mcp @scope/package` | Download and audit an npm MCP server package |
-| `/audit mcp https://github.com/user/mcp-server` | Download and audit an MCP server from GitHub |
-| `/audit hooks` | Audit hooks in settings.json |
-| `/audit claudemd` | Audit CLAUDE.md files for prompt injection |
-| `/audit all` | Run all audits on current environment |
-| `/audit` | Interactive mode — prompts for what to audit |
+| `/bix-utils:audit skill ./path/to/skill` | Audit a local skill directory |
+| `/bix-utils:audit skill https://github.com/user/repo` | Download and audit a skill from GitHub |
+| `/bix-utils:audit skill https://github.com/user/repo/tree/main/skills/foo` | Audit a specific subdirectory in a GitHub repo |
+| `/bix-utils:audit mcp` | Audit all configured MCP servers |
+| `/bix-utils:audit mcp my-server` | Audit a specific configured MCP server |
+| `/bix-utils:audit mcp @scope/package` | Download and audit an npm MCP server package |
+| `/bix-utils:audit mcp https://github.com/user/mcp-server` | Download and audit an MCP server from GitHub |
+| `/bix-utils:audit hooks` | Audit hooks in settings.json |
+| `/bix-utils:audit claudemd` | Audit CLAUDE.md files for prompt injection |
+| `/bix-utils:audit all` | Run all audits on current environment |
+| `/bix-utils:audit` | Interactive mode — prompts for what to audit |
 
 ### Target Formats
 

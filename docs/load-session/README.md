@@ -1,6 +1,4 @@
-# /load-session
-
-> Also available as `/bix-session:load-session`
+# /bix-session:load-session
 
 Load context from a previous Claude Code session into your current conversation. Browse your sessions, pick one, and choose between a compact AI summary or the full transcript.
 
@@ -15,8 +13,8 @@ Load context from a previous Claude Code session into your current conversation.
 
 | Command | What It Does |
 | ------- | ------------ |
-| `/load-session` | Browse recent sessions, pick one to load |
-| `/load-session my-session` | Load a named session directly |
+| `/bix-session:load-session` | Browse recent sessions, pick one to load |
+| `/bix-session:load-session my-session` | Load a named session directly |
 
 No flags to remember — the skill walks you through each step interactively.
 
@@ -31,7 +29,7 @@ Use Claude Code's built-in `/rename` command to give your current session a memo
 You can also name a session when starting it with `claude -n "my-session-name"`. Then load it later in any session with:
 
 ```
-/load-session my-feature-research
+/bix-session:load-session my-feature-research
 ```
 
 If you don't name your sessions, no problem — the browse view shows the first message from each session so you can find it visually.

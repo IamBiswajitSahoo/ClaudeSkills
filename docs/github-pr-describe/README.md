@@ -1,6 +1,4 @@
-# /github-pr-describe
-
-> Also available as `/github-pr-describe`
+# /bix-github:github-pr-describe
 
 Generate a well-structured PR description by analyzing the diff between the PR branch and its base branch, then push it to GitHub.
 
@@ -17,8 +15,8 @@ First, add the marketplace and install the `bix-github` plugin:
 
 | Command | Behavior |
 |---------|----------|
-| `/github-pr-describe 42` | Analyzes PR #42's diff, drafts a structured description, pushes after approval |
-| `/github-pr-describe` | Prompts for a PR number, then runs the same workflow |
+| `/bix-github:github-pr-describe 42` | Analyzes PR #42's diff, drafts a structured description, pushes after approval |
+| `/bix-github:github-pr-describe` | Prompts for a PR number, then runs the same workflow |
 
 ## Features
 

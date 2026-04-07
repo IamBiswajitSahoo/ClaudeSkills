@@ -1,6 +1,4 @@
-# /rewrite
-
-> Also available as `/bix-utils:rewrite`
+# /bix-utils:rewrite
 
 Rewrite your prompts using proven prompt engineering frameworks. Pick a framework, and a fast sub-agent restructures your prompt into a clear, structured version optimized for LLM comprehension.
 
@@ -15,8 +13,8 @@ Rewrite your prompts using proven prompt engineering frameworks. Pick a framewor
 
 | Command | What It Does |
 | ------- | ------------ |
-| `/rewrite "Build a REST API for user management"` | Rewrite the prompt using a selected framework |
-| `/rewrite` | Interactive mode — prompts you to type or paste your prompt |
+| `/bix-utils:rewrite "Build a REST API for user management"` | Rewrite the prompt using a selected framework |
+| `/bix-utils:rewrite` | Interactive mode — prompts you to type or paste your prompt |
 
 The skill walks you through framework selection interactively — no flags or options to memorize.
 
@@ -25,7 +23,7 @@ The skill walks you through framework selection interactively — no flags or op
 ```
 ┌──────────────────────────────────────────────────────┐
 │ Step 1: You provide your raw prompt                  │
-│   /rewrite "your prompt here"                        │
+│   /bix-utils:rewrite "your prompt here"                        │
 └─────────────────────────┬────────────────────────────┘
                           ▼
 ┌──────────────────────────────────────────────────────┐

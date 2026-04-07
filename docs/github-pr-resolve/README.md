@@ -1,6 +1,4 @@
-# /github-pr-resolve
-
-> Also available as `/github-pr-resolve`
+# /bix-github:github-pr-resolve
 
 Evaluate and triage existing review comments on a GitHub pull request, then implement agreed fixes.
 
@@ -17,8 +15,8 @@ First, add the marketplace and install the `bix-github` plugin:
 
 | Command | Behavior |
 |---------|----------|
-| `/github-pr-resolve 42` | Fetches review comments for PR #42, triages with you, implements agreed fixes |
-| `/github-pr-resolve` | Prompts for a PR number, then runs the same workflow |
+| `/bix-github:github-pr-resolve 42` | Fetches review comments for PR #42, triages with you, implements agreed fixes |
+| `/bix-github:github-pr-resolve` | Prompts for a PR number, then runs the same workflow |
 
 ## Features
 

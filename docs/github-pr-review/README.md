@@ -1,6 +1,4 @@
-# /github-pr-review
-
-> Also available as `/github-pr-review`
+# /bix-github:github-pr-review
 
 Review GitHub pull requests — drafts findings across 5 categories with severity labels, supports parallel agents for large PRs, and posts as a batched pending review after per-comment approval.
 
@@ -17,9 +15,9 @@ First, add the marketplace and install the `bix-github` plugin:
 
 | Command | Behavior |
 |---------|----------|
-| `/github-pr-review 42` | Reviews PR #42 in single-agent mode |
-| `/github-pr-review 42 -parallel` | Reviews PR #42 with 5+1 parallel agents |
-| `/github-pr-review` | Prompts for a PR number, then reviews |
+| `/bix-github:github-pr-review 42` | Reviews PR #42 in single-agent mode |
+| `/bix-github:github-pr-review 42 -parallel` | Reviews PR #42 with 5+1 parallel agents |
+| `/bix-github:github-pr-review` | Prompts for a PR number, then reviews |
 
 ## Features
 
