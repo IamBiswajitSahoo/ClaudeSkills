@@ -9,284 +9,104 @@ argument-hint: "<mode> [target]  — modes: skill <path|url>, mcp [server|packag
 
 # Security Audit
 
-Audit Claude Code extension surfaces for security risks: skills, MCP servers, hooks, and CLAUDE.md files.
+Audit Claude Code extension surfaces (skills, MCP servers, hooks, CLAUDE.md) for security risks. Quick pattern scan first, then optional parallel deep analysis.
 
-**Arguments:** `$ARGUMENTS` — the audit mode and optional target.
+## Phase 1 — Parse & route
 
-**Modes:**
-- `skill <path|url>` — audit a skill from a local path, GitHub URL, or GitHub subdirectory URL
-- `mcp [server-name|package]` — audit configured MCP servers, or fetch a specific npm package / GitHub URL to audit
-- `hooks` — audit hooks in settings.json
-- `claudemd` — audit CLAUDE.md files for prompt injection
-- `all` — run all audits on the current environment
+**Prereq:** verify Python 3 with `python3 --version 2>/dev/null || python --version 2>/dev/null`. Store the working command as `{PY}`. If neither works or it's Python 2.x, stop and tell the user to install Python 3.
 
-**Target formats (skill and mcp modes):**
-- Local path: `./path/to/skill` or `/absolute/path`
-- GitHub repo: `https://github.com/user/repo`
-- GitHub subdirectory: `https://github.com/user/repo/tree/main/skills/my-skill`
-- npm package (mcp only): `@scope/package-name`
+**Parse `$ARGUMENTS`** for `<mode> [target]`:
+- Modes: `skill`, `mcp`, `hooks`, `claudemd`, `all`.
+- Targets (skill/mcp only): local path, GitHub URL, GitHub subdirectory URL (e.g. `.../tree/main/skills/x`), or npm package `@scope/pkg` (mcp only).
+- If mode is missing/invalid, ask via `AskUserQuestion` with the 5 modes.
+- If `skill` or `mcp` with remote target and no local target given, ask for one.
 
----
-
-## Phase 1: Parse & Route
-
-### Step 1 — Check prerequisites
-
-Before anything else, verify Python 3 is available:
+**Resolve target** (skill/mcp with target):
 
 ```bash
-python3 --version 2>/dev/null || python --version 2>/dev/null
+{PY} "${CLAUDE_SKILL_DIR}/scripts/resolve-target.py" "<target>" --type <skill|mcp>
 ```
 
-If neither command succeeds, stop and display:
+Returns `{source, resolved_path, is_temporary, temp_root, error}`. On `error`, stop. If `is_temporary`, remember `temp_root` for Phase 4 cleanup and tell the user the target was downloaded.
 
-> **Python 3 is required but was not found on your system.**
->
-> Install Python 3 to use this skill:
-> - **macOS:** `brew install python3` or download from https://www.python.org/downloads/
-> - **Linux:** `sudo apt install python3` or `sudo dnf install python3`
-> - **Windows:** Download from https://www.python.org/downloads/ (check "Add to PATH" during install)
-> - **WSL:** `sudo apt install python3`
+For `mcp` without target: run `gather-mcp-config.py` — if no servers, stop with "No MCP servers configured". For `hooks`/`claudemd`: no resolution needed.
 
-If the version is Python 2.x (not 3.x), show the same message — Python 3 is required.
+## Phase 2 — Quick scan
 
-Store the working python command (`python3` or `python`) for use in later phases.
+Run the relevant gather + pattern-scan scripts in parallel (multiple `Bash` calls in one message):
 
-### Step 2 — Parse arguments
+| Mode | Gather | Pattern scan |
+|---|---|---|
+| skill | `gather-skill-inventory.py <path>` | `pattern-scan.py <path> --type skill` |
+| mcp | `gather-mcp-config.py <server-or-empty>` | `pattern-scan.py <src>` per server with local files |
+| hooks | `gather-hooks-config.py` | `pattern-scan.py <script>` for each referenced script |
+| claudemd | — | `pattern-scan.py ./CLAUDE.md --type skill` (+ `.claude/CLAUDE.md` if present) |
+| all | all four gather scripts in parallel | `pattern-scan.py . --type plugin` |
 
-Extract the mode and target from `$ARGUMENTS`:
-- If `$ARGUMENTS` starts with `skill`, extract the target (second argument — can be a local path, GitHub URL, or GitHub subdirectory URL). If no target given, use `AskUserQuestion`:
-  > "What skill would you like to audit? You can provide:"
-  > - A **local path** — `./path/to/skill`
-  > - A **GitHub URL** — `https://github.com/user/repo`
-  > - A **GitHub subdirectory** — `https://github.com/user/repo/tree/main/skills/my-skill`
-- If `$ARGUMENTS` starts with `mcp`, the optional second argument can be:
-  - A configured server name (audits local config)
-  - A GitHub URL (downloads and audits the MCP server source)
-  - An npm package name like `@scope/package` (downloads and audits the package)
-  - Empty (audits all configured MCP servers)
-- If `$ARGUMENTS` is `hooks`, `claudemd`, or `all`, no extra arguments needed.
-- If `$ARGUMENTS` is empty or unrecognized, use `AskUserQuestion` to present the modes:
-  > "What would you like to audit?"
-  > - **skill** — Audit a skill (local path or GitHub URL)
-  > - **mcp** — Audit MCP servers (configured, or fetch by URL/package name)
-  > - **hooks** — Audit hooks in settings.json
-  > - **claudemd** — Audit CLAUDE.md files
-  > - **all** — Run all audits on current environment
+All scripts are `{PY} "${CLAUDE_SKILL_DIR}/scripts/<name>" ...`.
 
-### Step 3 — Resolve target
-
-For `skill` and `mcp` modes where a target is provided, resolve it to a local directory:
-
-```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/resolve-target.py" "<target>" --type <skill|mcp>
-```
-
-The script outputs JSON with:
-- `source` — `local`, `github`, or `npm`
-- `resolved_path` — the local directory to audit
-- `is_temporary` — whether the directory was downloaded (should be cleaned up after audit)
-- `temp_root` — the temp directory to clean up (only if `is_temporary` is true)
-- `error` — if resolution failed, display this to the user and stop
-
-If the source is `github` or `npm`, inform the user: "Downloaded {source} target to temporary directory for auditing."
-
-For `mcp` mode without a target: verify MCP config files exist by running the gather script. If no servers found, report "No MCP servers configured" and stop.
-
-For `hooks` mode: no resolution needed — the gather script reads settings files directly.
-
-**Cleanup reminder:** If `is_temporary` is true, the temp directory at `temp_root` should be cleaned up after the audit completes. Note this for Phase 4.
-
----
-
-## Phase 2: Quick Scan (Fast, Low-Token)
-
-This phase runs fast bash-based scripts to get an immediate overview. Results determine whether deep analysis is needed and which sub-agents to spawn.
-
-### Step 1 — Run inventory and pattern scan
-
-Based on the mode, run the appropriate gather scripts and the pattern scanner. Run them in parallel where possible using multiple Bash calls.
-
-**For `skill` mode:**
-```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/gather-skill-inventory.py" "<target-path>"
-```
-```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/pattern-scan.py" "<target-path>" --type skill
-```
-
-**For `mcp` mode:**
-```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/gather-mcp-config.py" "<server-name-or-empty>"
-```
-Then run pattern scan on each MCP server's source if it references local files.
-
-**For `hooks` mode:**
-```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/gather-hooks-config.py"
-```
-Then run pattern scan on any referenced script files.
-
-**For `claudemd` mode:**
-Run pattern scan targeting CLAUDE.md files:
-```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/pattern-scan.py" "./CLAUDE.md" --type skill
-```
-Also scan `.claude/CLAUDE.md` if it exists.
-
-**For `all` mode:**
-Run all four gather scripts in parallel (4 Bash calls simultaneously):
-```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/gather-hooks-config.py"
-```
-```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/gather-mcp-config.py"
-```
-```bash
-{PYTHON_CMD} "${CLAUDE_SKILL_DIR}/scripts/pattern-scan.py" "." --type plugin
-```
-
-### Step 2 — Present quick scan summary
-
-Display a brief summary to the user:
+**Show summary:**
 
 ```
 ## Quick Scan Results
-
 Risk Score: {score}/100 — {verdict}
 Files scanned: {files_scanned}
 Pattern matches: {critical} critical, {high} high, {medium} medium, {low} low
-
-{If verdict is SAFE: "No suspicious patterns detected."}
-{If verdict is CAUTION+: list top 3 findings by severity}
 ```
 
-### Step 3 — Decide next steps
+If SAFE (0–20): "No suspicious patterns detected." If CAUTION+: list top 3 findings by severity.
 
-Use `AskUserQuestion`:
+**Ask next step** via `AskUserQuestion`:
+- SAFE: **Deep scan** / **Done**
+- CAUTION+: **Deep scan (recommended)** / **Show findings** / **Done**
 
-**If verdict is SAFE (score 0-20):**
-> "Quick scan found no suspicious patterns. Would you like to run a deep analysis anyway?"
-> - **Deep scan** — Run parallel agents for thorough semantic analysis
-> - **Done** — Accept quick scan results
+**Done** → Phase 4 with quick-scan results only. **Show findings** → print all findings by severity, then stop.
 
-**If verdict is CAUTION or higher (score 21+):**
-> "Quick scan flagged {N} findings. Recommend deep analysis to verify."
-> - **Deep scan** — Run parallel agents to analyze flagged areas (recommended)
-> - **Show findings** — View quick scan details without deep analysis
-> - **Done** — Stop here
+## Phase 3 — Deep analysis (parallel)
 
-If the user selects **Done**, skip to Phase 4 (Report) using only quick scan results.
-If the user selects **Show findings**, display all pattern scan findings grouped by severity, then stop.
+Read templates from `${CLAUDE_SKILL_DIR}/templates/`:
 
----
+| Mode | Template(s) | Agent(s) to launch |
+|---|---|---|
+| skill | `agent-skill-audit.md` | 1 skill audit agent |
+| mcp | `agent-mcp-audit.md` | 1 MCP audit agent |
+| hooks | `agent-hooks-audit.md` | 1 hooks audit agent |
+| claudemd | `agent-claudemd-audit.md` | 1 CLAUDE.md audit agent |
+| all | all four | up to 4 agents in parallel |
 
-## Phase 3: Deep Analysis (Parallel Sub-Agents)
+Launch all agents in a single message with parallel `Agent` calls. Each agent receives: its template instructions + relevant quick-scan JSON + inventory/config JSON + target path. Use `"model": "sonnet"` and a descriptive `description` per agent.
 
-Launch focused sub-agents in parallel based on the audit mode. Each agent receives its template instructions, the quick scan results, and the gathered inventory data.
+Wait for completion. Merge findings, sort by severity (Critical > High > Medium > Low > Info). Note any failed/timed-out agents in the report but continue.
 
-### Step 1 — Prepare agent prompts
+## Phase 4 — Report & cleanup
 
-Read the relevant agent template files from `${CLAUDE_SKILL_DIR}/templates/`:
+**Combined score:** start with pattern-scan score, add weight for new deep findings, cap at 100.
 
-- `skill` mode → read `agent-skill-audit.md`
-- `mcp` mode → read `agent-mcp-audit.md`
-- `hooks` mode → read `agent-hooks-audit.md`
-- `claudemd` mode → read `agent-claudemd-audit.md`
-- `all` mode → read ALL four templates
+| Score | Verdict |
+|---|---|
+| 0–20 | **SAFE** — no significant concerns |
+| 21–40 | **CAUTION** — minor concerns |
+| 41–60 | **SUSPICIOUS** — manual review recommended |
+| 61–80 | **DANGEROUS** — do NOT install without expert review |
+| 81–100 | **MALICIOUS** — avoid |
 
-### Step 2 — Launch parallel agents
+Build the report using `${CLAUDE_SKILL_DIR}/templates/report.md`. Sections: header (target, date, mode, score, verdict), scope audited, critical/high findings in full, medium/low and info in `<details>` blocks, clean signals, recommendations.
 
-Launch `Agent` calls in parallel — one per audit surface. Each agent receives:
-1. The template instructions (from the file read in Step 1)
-2. The quick scan JSON results relevant to its scope
-3. The inventory/config JSON from Phase 2
-4. The target path or working directory
+If DANGEROUS or MALICIOUS, prepend:
 
-**For `skill` mode** — launch 1 agent:
-- Skill audit agent with skill inventory + pattern scan results
+> **WARNING:** This audit found serious security concerns. Do NOT install or use this without careful manual review.
 
-**For `mcp` mode** — launch 1 agent:
-- MCP audit agent with MCP config data
+Include the original GitHub URL or npm package name in the header if the target was remote.
 
-**For `hooks` mode** — launch 1 agent:
-- Hooks audit agent with hooks config data
+**Cleanup:** if `is_temporary` was true, `rm -rf "<temp_root>"`.
 
-**For `claudemd` mode** — launch 1 agent:
-- CLAUDE.md audit agent with pattern scan results for CLAUDE.md files
+## Rules
 
-**For `all` mode** — launch up to 4 agents in parallel:
-- Hooks audit agent
-- MCP audit agent
-- CLAUDE.md audit agent
-- Pattern-based findings analysis agent (if any skill/plugin paths provided)
-
-Each agent call should include the model parameter `"model": "sonnet"` to optimize for speed and cost. Use the `description` parameter to label each agent clearly (e.g., "MCP server security audit", "Hooks security audit").
-
-### Step 3 — Collect results
-
-Wait for all agents to complete. Collect their structured findings. Merge findings from all agents into a unified list, sorted by severity (Critical > High > Medium > Low > Info).
-
-If any agent fails or times out, note it in the report and continue with available results.
-
----
-
-## Phase 4: Report
-
-### Step 1 — Calculate final score
-
-Combine the quick scan risk score with deep analysis findings:
-- Start with the pattern scan risk score
-- Add weight for any NEW findings from deep analysis not already in the pattern scan
-- Cap at 100
-
-Re-evaluate the verdict based on the combined score:
-- 0-20: **SAFE** — No significant security concerns
-- 21-40: **CAUTION** — Minor concerns, proceed with awareness
-- 41-60: **SUSPICIOUS** — Multiple red flags, manual review recommended
-- 61-80: **DANGEROUS** — Serious concerns, do NOT install/use without expert review
-- 81-100: **MALICIOUS** — Strong indicators of malicious intent, AVOID
-
-### Step 2 — Build the report
-
-Load `${CLAUDE_SKILL_DIR}/templates/report.md` for the report structure. Fill in all sections:
-
-1. **Header** — target, date, mode, risk score, verdict
-2. **Scope audited** — which surfaces were checked and their status
-3. **Critical & High findings** — always shown in full
-4. **Medium & Low findings** — in a collapsed details block
-5. **Informational notes** — in a collapsed details block
-6. **What looks clean** — positive signals (proper frontmatter, no binaries, etc.)
-7. **Recommendations** — prioritized action items
-
-### Step 3 — Present report
-
-Display the complete report to the user. If the verdict is DANGEROUS or MALICIOUS, add a clear warning banner at the top:
-
-```
-> **WARNING:** This audit found serious security concerns. Do NOT install or use this {skill/plugin/config} without careful manual review of each finding.
-```
-
-If the source was a GitHub URL or npm package, include the original URL in the report header so the user knows exactly what was audited.
-
-### Step 4 — Cleanup
-
-If the target was downloaded (i.e., `is_temporary` is true from Phase 1 Step 3), clean up the temporary directory:
-
-```bash
-rm -rf "<temp_root>"
-```
-
----
-
-## Important Rules
-
-- **Never auto-remediate** — this is an audit tool, not a fixer. Report findings; don't modify files.
-- **Never fabricate findings** — only report patterns and behaviors actually observed in the target.
-- **Always show the quick scan first** — the user should see immediate results before waiting for deep analysis.
-- **Always use parallel agents** — never run deep analysis sequentially when multiple surfaces are being audited.
-- **Always use sonnet model for sub-agents** — deep analysis agents should use `"model": "sonnet"` to reduce cost and latency.
-- **Always present findings by severity** — Critical first, Info last.
-- **Never expand scope silently** — if auditing a skill, don't scan the whole filesystem. Stick to the target.
-- **Always respect user choice** — if the user says "Done" after quick scan, stop. Don't push for deep analysis.
-- **Context matters** — a deployment skill needing Bash access is normal; a text formatting skill needing Bash is suspicious. Assess purpose vs. permissions.
+- **Never auto-remediate** — report only, never modify files.
+- **Never fabricate** — only report what's observed.
+- **Quick scan always first**, even if deep scan will follow.
+- **Parallel agents** when multiple surfaces are in scope — never sequential.
+- **Sonnet for sub-agents.** Critical > Info ordering in findings.
+- **Scope discipline** — auditing a skill does not scan the whole filesystem.
+- **Respect the user** — if they say Done, stop; don't push deep analysis.
+- **Context matters** — a deployment skill needing Bash is normal; a text-formatting skill needing Bash is suspicious. Assess purpose vs. permissions.

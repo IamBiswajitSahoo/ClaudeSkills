@@ -9,124 +9,82 @@ argument-hint: "<pr-number> [-parallel]"
 
 # GitHub PR Review
 
-Review a pull request, draft findings with severity labels, and post as a batched pending review after per-comment approval.
+Review a PR, draft findings by severity, post as a batched pending review after per-comment approval.
 
-**Arguments:** `$ARGUMENTS` — PR number, optionally followed by `-parallel` for parallel agent mode.
+## Phase 1 — Validate & gather
 
----
-
-## Phase 1: Validate & Gather
-
-### Step 1 — Parse arguments
-
-Extract the PR number and `-parallel` flag from `$ARGUMENTS`. If no PR number is provided or it's not a valid number, use `AskUserQuestion` to ask:
-> "Which PR number would you like me to review?"
-
-### Step 2 — Run the gather script
+Parse `$ARGUMENTS` for the PR number and optional `-parallel` flag. If missing/invalid, ask via `AskUserQuestion`: *"Which PR number would you like me to review?"*
 
 ```bash
 bash "${CLAUDE_SKILL_DIR}/scripts/gather-pr-context.sh" $ARGUMENTS
 ```
 
-The script outputs JSON with: `repo`, `pr_number`, `metadata`, `commit_sha`, `diff`, `project_rules` (CLAUDE.md/REVIEW.md contents if present), `eligibility`, `primary_language`, and `parallel_requested`.
+Returns `{repo, pr_number, metadata, commit_sha, diff, project_rules, eligibility, primary_language, parallel_requested}`. On `error`, stop.
 
-If the script returns an `error` field, display it to the user and stop.
-
-### Step 3 — Check eligibility
-
-If the PR is not in a reviewable state, use `AskUserQuestion`:
-
-- **Draft PR** (`eligibility.is_draft` is true): "This PR is a draft. Review anyway?"
-- **Closed/Merged** (`eligibility.state` is not OPEN): "This PR is [closed/merged]. Review anyway?"
-- **Already reviewed** (`eligibility.already_reviewed` is true): "You've already reviewed this PR. Review again?"
-
-Options: **Yes** / **Skip**. If Skip, stop.
+**Eligibility checks** via `AskUserQuestion` (options: **Yes** / **Skip**):
+- `eligibility.is_draft`: "This PR is a draft. Review anyway?"
+- `eligibility.state != OPEN`: "This PR is [closed/merged]. Review anyway?"
+- `eligibility.already_reviewed`: "You've already reviewed this PR. Review again?"
 
 If `eligibility.branch_matches` is false, warn: "You're on branch `{current_branch}` but the PR is on `{head_ref}`. Git blame results for pre-existing issue detection may be inaccurate."
 
-### Step 4 — Select review mode
+**Select mode:**
+- `-parallel` flag → parallel
+- `diff.lines > 3000` → ask: **Parallel** (faster, more tokens) / **Single** (slower, fewer tokens)
+- Otherwise → single
 
-- If `-parallel` was passed, use **parallel mode**.
-- Else if `diff.lines > 3000`, use `AskUserQuestion`:
-  > "This PR has {N} lines of diff. How would you like to review?"
-  - **Parallel** — "Faster: 5 agents review categories in parallel (uses more tokens)"
-  - **Single** — "Slower: one sequential pass through all categories (uses fewer tokens)"
-- Otherwise, default to **single mode**.
+## Phase 2 — Analyze
 
----
-
-## Phase 2: Analyze
-
-Load `${CLAUDE_SKILL_DIR}/templates/review-categories.md` for the 5 evaluation categories and severity rules.
-
-If `project_rules.claude_md` or `project_rules.review_md` is not null, incorporate those project-specific rules as **additional review criteria** alongside the 5 built-in categories. Project rules take precedence when they conflict with general guidance.
+Load `${CLAUDE_SKILL_DIR}/templates/review-categories.md` for the 5 categories and severity rules. If `project_rules.claude_md` or `project_rules.review_md` is present, incorporate them as additional criteria — project rules take precedence on conflict.
 
 ### Single mode
 
-Read the full diff. Evaluate all 5 categories sequentially. For each genuine issue found, draft a finding with: `path`, `line`, `body` (with optional suggestion block), and `severity` (Critical / Warning / Nit).
+Read the full diff. Evaluate all 5 categories sequentially. For each genuine issue, draft a finding: `{path, line, body, severity}` (Critical / Warning / Nit), with optional suggestion block in `body`.
 
 ### Parallel mode
 
-Launch 6 `Agent` calls in parallel using the dedicated review sub-agents. Each agent receives the diff content, PR metadata, and project rules (CLAUDE.md/REVIEW.md) if present as part of its prompt.
+Launch 6 `Agent` calls in a single message (all in parallel). **You MUST use the fully-qualified `subagent_type`** — the `bix-github:pr-review:` prefix is required, otherwise the call falls back to `general-purpose` and ignores the agent's `model:` frontmatter.
 
-**You MUST invoke each agent via the Agent tool using its fully-qualified `subagent_type`** (the `bix-github:pr-review:` prefix is required — without it the call falls back to `general-purpose` on the parent model and ignores the agent's `model:` frontmatter).
+| # | subagent_type | Scope |
+|---|---|---|
+| 1 | `bix-github:pr-review:correctness` | Logic errors, null safety, data integrity, edge cases, regression risk |
+| 2 | `bix-github:pr-review:conventions` | Naming, code organization, error handling, consistency |
+| 3 | `bix-github:pr-review:performance` | Hot-path allocations, complexity, redundant computation |
+| 4 | `bix-github:pr-review:security` | Input validation, injection, data exposure, access control |
+| 5 | `bix-github:pr-review:tests` | Missing tests, untested edges, stale tests, weak assertions |
+| 6 | `bix-github:pr-review:docs` | Missing/stale docs on public API. Also pass `primary_language`. **Skip entirely** if `primary_language` is null or unsupported. |
 
-The 5 category agents (launch all in parallel):
-1. `subagent_type: "bix-github:pr-review:correctness"` — logic errors, null safety, data integrity, edge cases, regression risk
-2. `subagent_type: "bix-github:pr-review:conventions"` — naming, code organization, error handling patterns, consistency
-3. `subagent_type: "bix-github:pr-review:performance"` — hot-path allocations, algorithmic complexity, redundant computation
-4. `subagent_type: "bix-github:pr-review:security"` — input validation, injection risks, data exposure, access control
-5. `subagent_type: "bix-github:pr-review:tests"` — missing tests, untested edge cases, stale tests, weak assertions
-
-The 6th agent (launch in parallel with the above):
-6. `subagent_type: "bix-github:pr-review:docs"` — missing or stale documentation on public API surfaces. Also pass `primary_language` to this agent. If `primary_language` is null or unsupported, skip this agent entirely.
-
-Each agent returns a JSON array of findings (`path`, `line`, `body`, `severity`). After all agents complete, parse and merge the arrays, then deduplicate: if multiple agents flag the same `path:line`, keep the finding with the higher severity.
+Each agent gets: diff content, PR metadata, and project rules if present. Each returns a JSON array of findings. After all complete, merge and deduplicate: if multiple agents flag the same `path:line`, keep the higher-severity one.
 
 ### Pre-existing issue detection (both modes)
 
-For each finding, check if the flagged code existed before the PR:
+For each finding, run `git blame -L <line>,<line> -- <path>`. If the blamed commit predates the PR branch, tag the finding `[Pre-existing]`.
 
-```bash
-git blame -L <line>,<line> -- <path>
-```
+### Sort
 
-Compare the blamed commit against the PR's commit range. If the code predates the PR branch, tag the finding as `[Pre-existing]`.
+New first, pre-existing last. Within each group: Critical > Warning > Nit.
 
-### Sort findings
+## Phase 3 — Docs review (single mode only)
 
-1. New findings first, pre-existing last
-2. Within each group: Critical > Warning > Nit
+**Skip in parallel mode** — handled by the `pr-review-docs` agent in Phase 2.
 
----
+If `primary_language` is null or unsupported, skip with a note. Otherwise load `${CLAUDE_SKILL_DIR}/templates/doc-review-guide.md` and apply language rules to the diff. Add findings: Nit for missing, Warning for stale.
 
-## Phase 3: Documentation Review
+## Phase 4 — Per-comment approval
 
-**Skip this phase in parallel mode** — it is already handled by the `pr-review-docs` sub-agent in Phase 2.
+Load `${CLAUDE_SKILL_DIR}/templates/review-comment-format.md` for line number rules and formatting.
 
-If `primary_language` is null or not supported, skip with a note: "Skipping doc review — unsupported or undetected language."
-
-Otherwise, load `${CLAUDE_SKILL_DIR}/templates/doc-review-guide.md` and apply the language-specific rules to the diff. Add doc findings to the list (Nit for missing, Warning for stale).
-
----
-
-## Phase 4: Per-Comment Approval
-
-Load `${CLAUDE_SKILL_DIR}/templates/review-comment-format.md` for line number rules and formatting reference.
-
-Present each finding individually via `AskUserQuestion`:
+Present each finding via `AskUserQuestion`:
 
 ```
 [Severity] Comment N — `path/file` line L: brief summary
 
-{Full comment text with explanation and optional suggestion block}
+{Full comment body with optional suggestion block}
 ```
 
-Options: **Post** / **Skip** / **Modify**
+Options: **Post** / **Skip** / **Modify**. On **Modify**, ask what to change, apply, re-present.
 
-If the user selects **Modify**: ask what to change, apply the edit, re-present the same comment for approval.
-
-After all comments are reviewed, show a summary:
+After all comments, show summary:
 
 ```
 Posted:  Comment 1 (src/auth.ts:20) [Critical], Comment 3 (src/utils.ts:45) [Nit]
@@ -134,13 +92,11 @@ Skipped: Comment 2 (src/config.ts:8) [Nit]
 Event type: REQUEST_CHANGES
 ```
 
-Then use `AskUserQuestion`: "Ready to submit the review with N comments?" — **Submit** / **Cancel**.
+Then ask: *"Ready to submit the review with N comments?"* — **Submit** / **Cancel**.
 
----
+## Phase 5 — Post review
 
-## Phase 5: Post Review
-
-Build the JSON payload with all approved comments. Load the commit SHA from the gather output.
+Build a JSON payload with approved comments, using `commit_sha` from the gather output:
 
 ```bash
 cat <<'JSONEOF' | gh api repos/:owner/:repo/pulls/{PR_NUMBER}/reviews -X POST --input -
@@ -151,30 +107,25 @@ cat <<'JSONEOF' | gh api repos/:owner/:repo/pulls/{PR_NUMBER}/reviews -X POST --
 JSONEOF
 ```
 
-Submit with the appropriate event type:
-- Any `[Critical]` comment posted → `REQUEST_CHANGES`
-- Only `[Warning]`/`[Nit]` posted → `COMMENT`
-- Zero comments posted → let user choose between `APPROVE` and `COMMENT`
+Submit with event type:
+- Any `[Critical]` posted → `REQUEST_CHANGES`
+- Only `[Warning]`/`[Nit]` → `COMMENT`
+- Zero comments → user picks `APPROVE` or `COMMENT`
 
 ```bash
 gh api repos/:owner/:repo/pulls/{PR_NUMBER}/reviews/{REVIEW_ID}/events \
   -X POST -f event="{EVENT}" -f body="{SUMMARY}"
 ```
 
----
+## Phase 6 — Summary
 
-## Phase 6: Summary
+Display posted count, skipped count, event type, and the PR URL from `metadata.url`.
 
-Display: posted count, skipped count, event type, and the PR URL from `metadata.url`.
+## Rules
 
----
-
-## Important Rules
-
-- **Always pending review** — even for a single comment. Batch all comments into one review.
-- **Always per-comment approval** — never post without the user approving each comment individually.
+- **Always a pending review**, even for one comment. Batch all comments into one review.
+- **Always per-comment approval** — never post without explicit user approval of each comment and the final submission.
 - **Always verify line numbers** — count from diff hunk headers, verify against actual file content.
-- **Always use JSON input** — never use `-f 'comments[][...]'` flag syntax (causes 422 errors).
-- **Never fabricate findings** — only flag issues actually present in the diff.
-- **Never auto-post** — the user must explicitly approve every comment and the final submission.
-- **Never expand scope** — if you notice issues outside the diff, note them but don't include in the review.
+- **Always JSON input** — never `-f 'comments[][...]'` (causes 422).
+- **Never fabricate** — only flag issues actually in the diff.
+- **Never expand scope** — note issues outside the diff but don't include them in the review.
