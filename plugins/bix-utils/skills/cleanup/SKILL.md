@@ -22,9 +22,9 @@ bash "${CLAUDE_SKILL_DIR}/scripts/scan.sh"
 
 The script emits a single JSON object. The fields you care about:
 
-- `markdown_table` — a fully rendered markdown table (Directory / Size / Contents / Safe to delete), sorted by size descending. **Print this verbatim to the user.**
+- `markdown_table` — a fully rendered markdown table (Directory / Size / Contents / Safe to delete), sorted by size descending, with **Reclaimable total** and **~/.claude/ total** footer rows already included. **Print this verbatim to the user.**
 - `active_sessions_note` — single-line note about protected active sessions. Print it below the table if the count is non-zero.
-- `total_human` — total size of `~/.claude/`. Print as "Total: \<value\>" below the note.
+- `reclaimable_human` — total size of directories marked safe-to-delete (already shown in the table footer; reference it in prose if helpful).
 - `safe_dirs` — array of directory names classified safe-to-delete. Used for `-all` mode and to build the selection prompt.
 - `directories[]` — per-directory records (`name`, `human`, `safe_to_delete`) for constructing the AskUserQuestion options.
 
@@ -50,7 +50,7 @@ Record the user's selected directory names — these are the arguments for Step 
 
 Pass the selected names to `delete.sh`. It handles:
 
-- Hard blocklist (`scripts`, `skills`, `memory`, `ide`, `settings*.json`, `credentials.json`, `CLAUDE.md`) — never touched even if passed as args.
+- Hard blocklist — never touched even if passed as args. Covers everything the official [~/.claude/ docs](https://code.claude.com/docs/en/claude-directory) describe as user-owned: `scripts/`, `skills/`, `agents/`, `commands/`, `output-styles/`, `rules/`, `memory/` (aka `agent-memory/`), `ide/`, `plugins/`, plus `settings.json`, `settings.local.json`, `credentials.json`, `keybindings.json`, `CLAUDE.md`, `MEMORY.md`, `.claude.json`, `.mcp.json`, `.worktreeinclude`.
 - Active-session protection — reads `sessions/*.json`, checks each `pid`, preserves any UUID transcript/dir whose session is still running.
 - `projects/` special-case — preserves `memory/`, `CLAUDE.md`, `settings*.json`, and active session UUIDs; only deletes stale UUID `.jsonl` files and UUID dirs.
 - Before/after sizing and the final report table.

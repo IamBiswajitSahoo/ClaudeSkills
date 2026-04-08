@@ -172,13 +172,14 @@ echo "  \"directories\": ["
 first=true
 SAFE_LIST=""
 MD_ROWS=""
+SAFE_BYTES_TOTAL=0
 while IFS='|' read -r size dname; do
   [ -n "$dname" ] || continue
   classify_dir "$dname"
   human=$(fmt_size "$size")
   case "$CLASSIFY_SAFE" in
     yes) safe_label="Yes" ;;
-    no)  safe_label="No" ;;
+    no)  safe_label="No (keep)" ;;
     *)   safe_label="Unknown" ;;
   esac
 
@@ -195,6 +196,7 @@ while IFS='|' read -r size dname; do
   MD_ROWS="${MD_ROWS}| \`${dname}/\` | ${human} | ${CLASSIFY_DESC} | ${safe_label} |"$'\n'
   if [ "$CLASSIFY_SAFE" = "yes" ]; then
     SAFE_LIST="${SAFE_LIST}${dname} "
+    SAFE_BYTES_TOTAL=$((SAFE_BYTES_TOTAL + size))
   fi
 done <<< "$SORTED_DIRS"
 echo ""
@@ -280,9 +282,12 @@ echo "],"
 
 # Pre-rendered markdown table (LLM pastes verbatim — no computation needed)
 # JSON-escape: replace newlines with \n, escape backslashes/quotes
-md_header="| Directory | Size | What it contains | Safe to delete? |\n|-----------|------|------------------|-----------------|\n"
-md_body=$(printf "%s" "$MD_ROWS" | sed 's/\\/\\\\/g; s/"/\\"/g' | awk '{printf "%s\\n", $0}')
+md_header="| Directory | Size | What it contains | Safe to delete? |\n|-----------|-----:|------------------|:---------------:|\n"
+md_footer="| **Reclaimable total** | **$(fmt_size "$SAFE_BYTES_TOTAL")** | sum of all rows marked *Yes* | — |"$'\n'"| **~/.claude/ total** | **$(fmt_size "$total")** | all directories above | — |"$'\n'
+md_body=$(printf "%s%s" "$MD_ROWS" "$md_footer" | sed 's/\\/\\\\/g; s/"/\\"/g' | awk '{printf "%s\\n", $0}')
 echo "  \"markdown_table\": \"${md_header}${md_body}\","
+echo "  \"reclaimable_bytes\": $SAFE_BYTES_TOTAL,"
+echo "  \"reclaimable_human\": \"$(fmt_size "$SAFE_BYTES_TOTAL")\","
 echo "  \"active_sessions_note\": \"${active_count} active session(s) detected ($(fmt_size "$active_bytes")) — these will be preserved.\""
 
 echo "}"

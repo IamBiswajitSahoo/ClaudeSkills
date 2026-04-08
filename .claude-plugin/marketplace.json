@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "A collection of useful Claude Code skills that I use in my work daily.",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -13,7 +13,7 @@
       "name": "bix-github",
       "source": "./plugins/bix-github",
       "description": "GitHub PR workflow skills — describe, review (with optional parallel agents), and resolve review comments.",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "category": "github",
       "tags": [
         "github",
@@ -29,7 +29,7 @@
       "name": "bix-session",
       "source": "./plugins/bix-session",
       "description": "Load context from a previous Claude Code session into the current one — compact summary or full transcript, with smart template auto-selection.",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "category": "productivity",
       "tags": [
         "session",
@@ -44,7 +44,7 @@
       "name": "bix-utils",
       "source": "./plugins/bix-utils",
       "description": "Everyday productivity skills — security audit, ~/.claude cleanup, and prompt rewriting via curated frameworks.",
-      "version": "1.2.2",
+      "version": "1.2.3",
       "category": "utilities",
       "tags": [
         "utilities",
