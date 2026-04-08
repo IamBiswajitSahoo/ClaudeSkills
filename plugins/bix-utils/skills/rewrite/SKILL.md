@@ -11,10 +11,12 @@ argument-hint: '"your prompt here"'
 
 Rewrite the user's raw prompt (`$ARGUMENTS`) into a structured version using a prompt engineering framework. All reasoning is delegated to haiku sub-agents to keep main-session context lean.
 
-## Phase 1 — Capture prompt
+## Phase 1 — Capture prompt and context
 
 - If `$ARGUMENTS` is non-empty, use it as the original prompt.
 - If empty, ask via `AskUserQuestion`: *"What prompt would you like to rewrite?"* — AskUserQuestion requires ≥2 options, so use placeholders **"Type my prompt"** and **"Paste from clipboard"**. The user types into the "Other" field; use that text.
+- **Capture conversation context.** Before delegating, write a short `CONTEXT SUMMARY` (≤150 words) drawn from the current session: what the user is working on, relevant files/tech, prior decisions, and any constraints the user has stated. If the skill was invoked at the start of a session with no prior turns, set `CONTEXT SUMMARY: (none — fresh session)`. Never fabricate context — only include what was actually discussed.
+- This summary is passed to both the recommender (Phase 2 Step 0) and the rewriter (Phase 3) so framework choice and rewriting reflect the real task, not just the prompt text in isolation.
 
 ## Phase 2 — Select framework
 
@@ -22,7 +24,18 @@ Flow: **recommend first, browse if needed.** Happy path = 1 question.
 
 ### Step 0 — Recommendation (sub-agent)
 
-Invoke **Agent** with `subagent_type: "bix-utils:rewrite:recommender"`, `model: "haiku"`, `description: "Recommend prompt framework"`, and `prompt:` set to the user's original prompt verbatim (no extra instructions — the sub-agent has its own catalog).
+Invoke **Agent** with `subagent_type: "bix-utils:rewrite:recommender"`, `model: "haiku"`, `description: "Recommend prompt framework"`, and `prompt`:
+
+```
+CONTEXT SUMMARY:
+{context_summary}
+
+---
+ORIGINAL PROMPT:
+{original_prompt}
+```
+
+The sub-agent has its own catalog — do not add extra instructions.
 
 It returns exactly:
 
@@ -91,6 +104,11 @@ For named frameworks, read `${CLAUDE_SKILL_DIR}/templates/{key}.md` where `{key}
 
 ```
 Rewrite the following user prompt using the framework template below. Output ONLY the rewritten prompt.
+
+---
+CONTEXT SUMMARY:
+
+{context_summary}
 
 ---
 ORIGINAL PROMPT:

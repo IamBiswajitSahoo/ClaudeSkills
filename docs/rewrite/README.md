@@ -1,6 +1,6 @@
 # /bix-utils:rewrite
 
-Rewrite your prompts using proven prompt engineering frameworks. A fast sub-agent recommends the best-fit framework for your prompt, and another sub-agent restructures it into a clear, LLM-optimized version.
+Rewrite your prompts using proven prompt engineering frameworks. A fast sub-agent recommends the best-fit framework for your prompt, and another sub-agent restructures it into a clear, LLM-optimized version. Both sub-agents receive a short **context summary** of the current conversation, so framework selection and rewriting reflect what you're actually working on — not just the prompt text in isolation.
 
 ## Installation
 
