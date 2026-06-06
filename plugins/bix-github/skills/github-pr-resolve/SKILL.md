@@ -83,10 +83,30 @@ If a fix reveals additional issues, note them but **do not expand scope** withou
 
 Remind the user that changes are **not committed** — they can review the diff and commit when ready.
 
+## Phase 7 — Commit, push & reply
+
+After the user has reviewed the diff:
+
+1. **Commit** the changes (user may ask explicitly, or confirm after reviewing the diff).
+2. **Ask the user to confirm push** — do NOT push without confirmation.
+3. Once the user confirms the push is done, **post reply comments** on each resolved thread in the PR with the commit hash so the reviewer can browse to the exact commit.
+
+### Posting reply comments — correct GitHub API endpoint
+
+To reply to an inline PR comment thread, create a new comment on the PR with the `in_reply_to` field set to the root comment ID:
+
+```bash
+gh api repos/{owner}/{repo}/pulls/{pr_number}/comments \
+  -f body="Fixed in {commit_hash} — {brief description of fix}." \
+  -F in_reply_to={root_comment_id}
+```
+
+**Do NOT** use `pulls/comments/{id}/replies` — that endpoint does not exist and returns a 404.
+
 ## Rules
 
 - Never skip triage — always let the user decide on each comment.
 - For Explore items, always get explicit approval on the approach before implementing.
 - Never expand scope silently — note additional issues but ask before fixing them.
-- Do NOT commit changes — leave that to the user.
+- Do NOT push changes without explicit user confirmation.
 - Use `TaskCreate`/`TaskUpdate`, not temp files, for progress tracking.
