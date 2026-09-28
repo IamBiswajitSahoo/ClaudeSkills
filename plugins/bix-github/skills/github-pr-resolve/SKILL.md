@@ -75,7 +75,7 @@ For each thread, ask via `AskUserQuestion`:
 - Options, with the category's default action first and marked **(Recommended)**:
   - **Fix** — implement the change.
   - **Explore** — needs codebase exploration before deciding.
-  - **Reply only** — post the drafted Agree-NoFix / Clarify / Disagree / Outdated reply; include the draft in the option's description.
+  - **Reply only** — post the drafted Agree-NoFix / Clarify / Disagree / Outdated reply; include the draft in the option's description. Drafts follow **Writing style**.
   - **Skip** — do nothing.
 
 Batch up to 4 threads per `AskUserQuestion` call. Group threads in the same file together. Triage actionable review summaries (not pure "LGTM") the same way. Collect all responses before proceeding. If the user edits a drafted reply via "Other", use their text.
@@ -114,7 +114,7 @@ After the user has reviewed the diff:
 1. **Commit** the changes (user may ask explicitly, or confirm after reviewing the diff). Skip steps 1–2 when there are no fixes.
 2. **Ask the user to confirm push** — do NOT push without confirmation.
 3. Once the push is done, **post reply comments**:
-   - **Fix** threads — with the commit hash so the reviewer can browse to the exact commit.
+   - **Fix** threads — with the commit hash so the reviewer can browse to the exact commit, written per **Writing style**.
    - **Reply only** threads — the approved draft.
    Post sequentially, not in parallel — ordering matters for thread coherence.
 4. **Offer to resolve threads.** For threads the reply closes (Fix, and Outdated), ask via `AskUserQuestion`: *"Mark these {K} threads as resolved?"* Never resolve without asking, and never resolve Clarify or Disagree threads — the reviewer answers those.
@@ -140,6 +140,34 @@ gh api graphql -f query='
   }' -F id="{thread_node_id}"
 ```
 
+## Writing style
+
+Everything posted to GitHub is read by teammates who did not see this session. Write so any of them understands it on the first read.
+
+- **Plain words.** Describe what the code does in everyday language. Name a class, method or file only when the reader needs it to find the change. No jargon, invented labels, metaphors or internal shorthand.
+- **Short.** One idea per sentence, one to three sentences per point. If a sentence needs a chain of dashes, colons or semicolons, split it or cut it.
+- **What and why only.** Say what changed (or what is wrong) in the code, and the reason when it is not obvious. Leave out background, history, alternatives you considered, low-level mechanics and edge-case trivia nobody asked about.
+- **No thinking out loud.** Never narrate your reasoning or how you reached a conclusion. No "I noticed", "it seems", "interestingly", "note that", hedging or asides. State the result.
+- **Reread before posting.** If a teammate new to this area would need to read it twice, rewrite it shorter and plainer.
+
+A reply is one or two sentences:
+
+- **Fixed** — what was changed, plus the commit hash. Add the reason only if the reviewer could not guess it.
+- **Not fixing now** — why, in one sentence, plus the tracking issue if there is one.
+- **Question** — one specific question.
+- **Disagree** — the concrete reason the current code is correct, in plain words.
+- **Outdated** — what the code does now.
+
+**Example**
+
+Too dense:
+
+> Agreed — the resolution ladder was falling through to the disk-sourced reseed before the corrected-mold rung, which inverted precedence. Reordered the dispatch so the rung fires first; `abc1234`.
+
+Clear:
+
+> Fixed in `abc1234`. The saved corrected mold is now loaded before falling back to the scan file.
+
 ## Rules
 
 - Never skip triage — always let the user decide on each comment.
@@ -147,6 +175,7 @@ gh api graphql -f query='
 - Never fabricate agreement — if the reviewer is wrong, recommend a polite Disagree reply with the reasoning.
 - For Explore items, always get explicit approval on the approach before implementing.
 - Never expand scope silently — note additional issues but ask before fixing them.
+- **Always plain and short** — every reply follows the **Writing style** rules above. No jargon, no reasoning narrative.
 - Do NOT push changes without explicit user confirmation.
 - Never post a reply the user has not approved, and never resolve a thread without asking.
 - Use `TaskCreate`/`TaskUpdate`, not temp files, for progress tracking.

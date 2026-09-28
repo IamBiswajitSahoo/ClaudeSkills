@@ -41,6 +41,7 @@ Return your findings as a JSON array. If you find no issues, return `[]`.
 Rules:
 - `line` must be the line number in the **new version** of the file where the untested code lives (not a test file)
 - `body` should explain what is missing and suggest what tests to add
+- `body` must be plain and short: at most three one-to-two-sentence parts (problem, impact if not obvious, fix). No jargon, invented labels or reasoning narrative.
 - Only flag **genuine gaps** for code actually in the diff — never fabricate findings
 - Do not flag issues outside the diff
 - Output ONLY the JSON array — no preamble, no explanation, no wrapper text

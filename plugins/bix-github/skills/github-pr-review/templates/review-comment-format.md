@@ -114,6 +114,34 @@ Pre-existing findings are shown **after** all new findings, grouped separately.
 
 ---
 
+## Writing style
+
+Everything posted to GitHub is read by teammates who did not see this session. Write so any of them understands it on the first read.
+
+- **Plain words.** Describe what the code does in everyday language. Name a class, method or file only when the reader needs it to find the change. No jargon, invented labels, metaphors or internal shorthand.
+- **Short.** One idea per sentence, one to three sentences per point. If a sentence needs a chain of dashes, colons or semicolons, split it or cut it.
+- **What and why only.** Say what changed (or what is wrong) in the code, and the reason when it is not obvious. Leave out background, history, alternatives you considered, low-level mechanics and edge-case trivia nobody asked about.
+- **No thinking out loud.** Never narrate your reasoning or how you reached a conclusion. No "I noticed", "it seems", "interestingly", "note that", hedging or asides. State the result.
+- **Reread before posting.** If a teammate new to this area would need to read it twice, rewrite it shorter and plainer.
+
+A comment body has at most three parts, each one or two sentences:
+
+1. **The problem** — what is wrong in this code.
+2. **The impact** — what breaks or gets worse, only if not obvious.
+3. **The fix** — what to change, ideally as a `suggestion` block.
+
+**Example**
+
+Too dense:
+
+> The ownership invariant here is inverted relative to the lifecycle seam — teardown races the re-seed path, so a stale reference can survive into the next session's resolution pass.
+
+Clear:
+
+> `OnDestroy` clears `this.mesh` after the next session has already set it, so the new mesh is lost. Clear it in `EndSession` instead.
+
+---
+
 ## Code Suggestions
 
 Inside the JSON `body` field, use `\n` for newlines:

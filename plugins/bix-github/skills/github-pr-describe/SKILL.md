@@ -37,7 +37,7 @@ Load `${CLAUDE_SKILL_DIR}/templates/description.md` and follow its section and f
 - Only include sections that have relevant changes — omit empty sections.
 - TL;DR table + bullets always come first.
 - Preserve any ticket/issue links from the existing PR body under `**Tickets:**` at the top.
-- Concise but precise — a reviewer should understand the *what* and *why* without reading the code.
+- Follow the template's **Writing style** rules: plain words, short, only what changed and why. No jargon and no reasoning narrative.
 - Never fabricate changes.
 
 ## Phase 4 — User review

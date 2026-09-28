@@ -64,6 +64,7 @@ Return your findings as a JSON array. If you find no issues, return `[]`.
 Rules:
 - `line` must be the line number in the **new version** of the file, visible in the diff
 - Always use `suggestion` blocks so the author can accept with one click
+- `body` must be plain and short: one or two sentences on what is missing or stale, then the suggestion. No jargon or reasoning narrative.
 - Match the existing documentation style in the codebase
 - Read the actual implementation before writing the doc — don't guess what parameters do
 - Only flag **genuine issues** actually present in the diff — never fabricate findings

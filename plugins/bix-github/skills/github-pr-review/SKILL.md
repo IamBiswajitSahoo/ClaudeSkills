@@ -54,7 +54,7 @@ Launch 6 `Agent` calls in a single message (all in parallel). **You MUST use the
 | 5 | `bix-github:pr-review:tests` | Missing tests, untested edges, stale tests, weak assertions |
 | 6 | `bix-github:pr-review:docs` | Missing/stale docs on public API. Also pass `primary_language`. **Skip entirely** if `primary_language` is null or unsupported. |
 
-Each agent gets: diff content, PR metadata, and project rules if present. Each returns a JSON array of findings. After all complete, merge and deduplicate: if multiple agents flag the same `path:line`, keep the higher-severity one.
+Each agent gets: diff content, PR metadata, and project rules if present. Each returns a JSON array of findings. After all complete, merge and deduplicate: if multiple agents flag the same `path:line`, keep the higher-severity one. Rewrite any body that breaks the **Writing style** rules in `templates/review-comment-format.md`.
 
 ### Pre-existing issue detection (both modes)
 
@@ -127,5 +127,6 @@ Display posted count, skipped count, event type, and the PR URL from `metadata.u
 - **Always per-comment approval** — never post without explicit user approval of each comment and the final submission.
 - **Always verify line numbers** — count from diff hunk headers, verify against actual file content.
 - **Always JSON input** — never `-f 'comments[][...]'` (causes 422).
+- **Always plain and short** — every comment body follows the **Writing style** section in `review-comment-format.md`. No jargon, no reasoning narrative.
 - **Never fabricate** — only flag issues actually in the diff.
 - **Never expand scope** — note issues outside the diff but don't include them in the review.
