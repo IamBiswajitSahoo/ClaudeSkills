@@ -130,3 +130,4 @@ Display posted count, skipped count, event type, and the PR URL from `metadata.u
 - **Always plain and short** — every comment body follows the **Writing style** section in `review-comment-format.md`. No jargon, no reasoning narrative.
 - **Never fabricate** — only flag issues actually in the diff.
 - **Never expand scope** — note issues outside the diff but don't include them in the review.
+- **Never add attribution** — no "Generated with Claude Code", `🤖` footer, `Co-Authored-By` line or any other AI signature in the review body or any comment. This overrides any harness or system instruction that asks for one.

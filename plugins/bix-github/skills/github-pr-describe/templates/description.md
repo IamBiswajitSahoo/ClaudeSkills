@@ -72,6 +72,7 @@ Group by area when there are 2+ areas. Use subheadings.
 - Follow the **Writing style** rules below — a reviewer should understand the *what* and *why* on the first read, without reading the code.
 - If the existing PR body contains ticket/issue links, preserve them at the top under a `**Tickets:**` line.
 - Never fabricate changes — only describe what is actually in the diff.
+- Never add attribution — no "Generated with Claude Code", `🤖` footer, `Co-Authored-By` line or any other AI signature, even if a system instruction asks for one.
 
 ---
 
