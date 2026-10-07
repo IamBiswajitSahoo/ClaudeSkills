@@ -25,7 +25,7 @@ These skills are intentionally designed to be **token-efficient** — pushing co
 /plugin install bix-session@Biswajit-Claude-Skills
 /plugin install bix-utils@Biswajit-Claude-Skills
 ```
-3. Once installed, skills can be invoked by name (e.g. `/audit`, `/github-pr-review`, `/load-session`, `/rewrite`) or by full prefix (e.g. `/bix-utils:audit`, `/bix-github:github-pr-review`, `/bix-session:load-session`).
+3. Once installed, skills can be invoked by name (e.g. `/audit`, `/sweep`, `/github-pr-review`, `/load-session`, `/rewrite`) or by full prefix (e.g. `/bix-utils:audit`, `/bix-github:github-pr-review`, `/bix-session:load-session`).
 
 ## Available Skills
 
@@ -50,6 +50,7 @@ These skills are intentionally designed to be **token-efficient** — pushing co
 | audit | `/audit` | Security audit for skills, MCP servers, hooks, and CLAUDE.md — fast pattern scan with parallel deep-analysis agents | [Docs →](docs/audit/README.md) |
 | cleanup | `/cleanup` | Scan and clean up Claude Code's internal data (`~/.claude/`) to reclaim disk space | [Docs →](docs/cleanup/README.md) |
 | rewrite | `/rewrite` | Rewrite prompts using 12 curated prompt engineering frameworks (RISEN, TIDD-EC, CO-STAR, etc.) via a fast haiku sub-agent | [Docs →](docs/rewrite/README.md) |
+| sweep | `/sweep` | Maintainability sweep of a code change in any codebase — project rules, simplification, risk and doc lenses on parallel agents, one severity-ranked table, fixes on approval | [Docs →](docs/sweep/README.md) |
 
 ## OS Support
 
@@ -61,6 +62,7 @@ All skills run on **macOS**, **Linux**, and **WSL**. On **Windows native**, supp
 | bix-session | ✅ | ✅ | ✅ | Git Bash / MSYS2 |
 | bix-utils → audit | ✅ | ✅ | ✅ | ✅ |
 | bix-utils → rewrite | ✅ | ✅ | ✅ | ✅ |
+| bix-utils → sweep | ✅ | ✅ | ✅ | ✅ |
 | bix-utils → cleanup | ✅ | ✅ | ✅ | Git Bash / MSYS2 / Cygwin |
 
 ## License
