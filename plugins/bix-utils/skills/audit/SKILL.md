@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Security audit for Claude Code skills, MCP servers, hooks, and CLAUDE.md files — runs fast pattern scan then parallel deep-analysis agents.
+description: Security audit for Claude Code skills, MCP servers, hooks, and CLAUDE.md files — runs fast pattern scan then parallel deep-analysis agents. Use when the user wants to vet a skill or MCP server before installing it, or check their Claude Code setup for risky hooks or instructions.
 metadata:
   author: Biswajit Sahoo (https://github.com/IamBiswajitSahoo)
   license: Apache-2.0

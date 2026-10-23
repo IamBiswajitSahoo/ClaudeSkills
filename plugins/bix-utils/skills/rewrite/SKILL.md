@@ -22,6 +22,8 @@ Rewrite the user's raw prompt (`$ARGUMENTS`) into a structured version using a p
 
 Flow: **recommend first, browse if needed.** Happy path = 1 question.
 
+**Standalone install** (no `bix-utils:rewrite:*` agents available): for both sub-agent calls below, launch `general-purpose` with the same `model` and prompt, prefixed with "Read `${CLAUDE_SKILL_DIR}/references/agents/<name>.md` and follow it as your instructions", where `<name>` is `recommender` or `rewriter`.
+
 ### Step 0 — Recommendation (sub-agent)
 
 Invoke **Agent** with `subagent_type: "bix-utils:rewrite:recommender"`, `model: "haiku"`, `description: "Recommend prompt framework"`, and `prompt`:

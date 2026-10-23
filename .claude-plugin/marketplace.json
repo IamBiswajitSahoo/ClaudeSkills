@@ -44,7 +44,7 @@
       "name": "bix-utils",
       "source": "./plugins/bix-utils",
       "description": "Everyday productivity skills — security audit, code sweep, ~/.claude cleanup, and prompt rewriting via curated frameworks.",
-      "version": "1.4.0",
+      "version": "1.5.0",
       "category": "utilities",
       "tags": [
         "utilities",

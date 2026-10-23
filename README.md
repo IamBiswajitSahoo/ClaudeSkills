@@ -50,7 +50,17 @@ These skills are intentionally designed to be **token-efficient** — pushing co
 | audit | `/audit` | Security audit for skills, MCP servers, hooks, and CLAUDE.md — fast pattern scan with parallel deep-analysis agents | [Docs →](docs/audit/README.md) |
 | cleanup | `/cleanup` | Scan and clean up Claude Code's internal data (`~/.claude/`) to reclaim disk space | [Docs →](docs/cleanup/README.md) |
 | rewrite | `/rewrite` | Rewrite prompts using 12 curated prompt engineering frameworks (RISEN, TIDD-EC, CO-STAR, etc.) via a fast haiku sub-agent | [Docs →](docs/rewrite/README.md) |
-| sweep | `/sweep` | Maintainability sweep of a code change in any codebase — project rules, simplification, risk and doc lenses on parallel agents, one severity-ranked table, fixes on approval | [Docs →](docs/sweep/README.md) |
+| sweep | `/sweep` | Maintainability sweep of a code change in any codebase — project rules, simplification, reverse-analysis, risk and doc lenses on parallel agents, one severity-ranked table, fixes on approval | [Docs →](docs/sweep/README.md) |
+
+## Standalone Skill Zips
+
+Each skill also works on its own, outside its plugin (for example, listed on a skills marketplace such as [Agensi](https://www.agensi.io)). Build one zip per skill into `dist/agensi/`:
+
+```
+scripts/package-agensi.sh
+```
+
+The script bundles the plugin agents a skill uses into the zip's `references/agents/`. When the plugin's agents aren't installed, the skill runs them as `general-purpose` agents with those instructions.
 
 ## OS Support
 

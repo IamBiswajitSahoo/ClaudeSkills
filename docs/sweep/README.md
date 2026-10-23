@@ -39,6 +39,7 @@ get one severity-ranked table, and nothing changes until you approve it.
 | `conventions` | Haiku | Project-rule breaks, abbreviated names, magic literals, dead code and imports, comments that narrate or cite instead of stating the rule, user-facing text leaking internals |
 | `simplify` | Sonnet | Vestigial structure from a changed approach, redundancy, speculative checks, over-engineering, reinvented helpers, misplacement, fragmentation, duplicated UI. Runs over whole modules when a change adds or removes files |
 | `risk` | Sonnet | Correctness, a name changed on one side of the wire, security, performance and query cost, missing or stale tests |
+| `reverse` | Sonnet | Reverse analysis against the codebase and the request: pieces that already exist, a new pattern where siblings have one, pieces no requirement needs or requirements missed, state owned at the wrong level, tests already covered elsewhere |
 | `docs` | Sonnet | Touched Markdown: stale names and values, change-narration, verbosity, non-executable procedures |
 
 ## Severity

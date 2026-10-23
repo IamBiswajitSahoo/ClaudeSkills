@@ -113,6 +113,8 @@ TEMPLATE:
 
 The fully-qualified `bix-session:load-session:` prefix is required — without it the call silently falls back to `general-purpose` on the parent model.
 
+**Standalone install** (no `bix-session:load-session:summarizer` agent available): launch `general-purpose` with `model: "sonnet"` and the same prompt, prefixed with "Read `${CLAUDE_SKILL_DIR}/references/agents/summarizer.md` and follow it as your instructions."
+
 On error or empty result, run `rm -f "<transcript_path>"` yourself and suggest a different template or full mode.
 
 **Inject:**
@@ -147,6 +149,6 @@ Read the file with the **Read** tool, output its contents to the user, then `rm 
 - **Never load the current session into itself** — compare resolved UUID against `${CLAUDE_SESSION_ID}`.
 - **Never print the transcript via Bash** — always use `--out-file`, consumed by the sub-agent (compact) or Read tool (full).
 - **Always delegate** compact summarization to `bix-session:load-session:summarizer`. Never inline. Never via `claude --resume`.
-- **Always clean up the temp file** — sub-agent does it in compact mode; skill does it in full mode. SessionStart hook is a safety net for crashes.
+- **Always clean up the temp file** — sub-agent does it in compact mode; skill does it in full mode. SessionStart hook is a safety net for crashes. A standalone install has no hook, so in Phase 1 run `find "${TMPDIR:-/tmp}" -maxdepth 1 -type f -name 'bix-load-session-*.md' -mmin +60 -delete 2>/dev/null` instead.
 - **Always show token estimates** before full mode and require confirmation.
 - Scripts return JSON with an `error` field — check and surface it.

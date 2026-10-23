@@ -1,6 +1,6 @@
 ---
 name: github-pr-review
-description: Review GitHub pull requests — drafts findings across 5 categories with severity labels, supports parallel agents for large PRs, and posts as a batched pending review after per-comment approval.
+description: Review GitHub pull requests — drafts findings across 5 categories with severity labels, supports parallel agents for large PRs, and posts as a batched pending review after per-comment approval. Use when the user wants to review a PR, give feedback on a pull request, or post review comments.
 metadata:
   author: Biswajit Sahoo (https://github.com/IamBiswajitSahoo)
   license: Apache-2.0
@@ -53,6 +53,8 @@ Launch 6 `Agent` calls in a single message (all in parallel). **You MUST use the
 | 4 | `bix-github:pr-review:security` | Input validation, injection, data exposure, access control |
 | 5 | `bix-github:pr-review:tests` | Missing tests, untested edges, stale tests, weak assertions |
 | 6 | `bix-github:pr-review:docs` | Missing/stale docs on public API. Also pass `primary_language`. **Skip entirely** if `primary_language` is null or unsupported. |
+
+**Standalone install** (no `bix-github:pr-review:*` agents available): launch `general-purpose` with `model: "sonnet"`, and start each prompt with "Read `${CLAUDE_SKILL_DIR}/references/agents/<name>.md` and follow it as your instructions", where `<name>` is the last part of the `subagent_type`.
 
 Each agent gets: diff content, PR metadata, and project rules if present. Each returns a JSON array of findings. After all complete, merge and deduplicate: if multiple agents flag the same `path:line`, keep the higher-severity one. Rewrite any body that breaks the **Writing style** rules in `templates/review-comment-format.md`.
 

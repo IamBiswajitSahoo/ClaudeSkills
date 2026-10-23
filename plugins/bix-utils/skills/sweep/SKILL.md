@@ -1,6 +1,6 @@
 ---
 name: sweep
-description: Maintainability sweep of a code change in any codebase — checks it against the project's own rules, cuts vestigial, redundant, speculative and dead code, flags correctness, contract-drift, security, performance and test risks, and checks touched docs for accuracy and bloat. Fans the reading out to haiku/sonnet lens agents, reports one severity-ranked table, and fixes only what the user approves. Use when the user says "sweep", "sweep the changes", "clean this up", or before committing a non-trivial change.
+description: Maintainability sweep of a code change in any codebase — checks it against the project's own rules, cuts vestigial, redundant, speculative and dead code, reverse-analyses it against what the codebase already provides and what was asked for, flags correctness, contract-drift, security, performance and test risks, and checks touched docs for accuracy and bloat. Fans the reading out to haiku/sonnet lens agents, reports one severity-ranked table, and fixes only what the user approves. Use when the user says "sweep", "sweep the changes", "clean this up", or before committing a non-trivial change.
 metadata:
   author: Biswajit Sahoo (https://github.com/IamBiswajitSahoo)
   license: Apache-2.0
@@ -38,12 +38,19 @@ The main session orchestrates; agents read. Dispatch every lens in **one message
 | Simplify | `bix-utils:sweep:simplify` | sonnet | always (`mode: diff`) |
 | Module simplify | `bix-utils:sweep:simplify` | sonnet | a file is added or removed, 3+ files of one module change, or `--module` (`mode: module`) |
 | Risk | `bix-utils:sweep:risk` | sonnet | always |
+| Reverse | `bix-utils:sweep:reverse` | sonnet | always |
 | Docs | `bix-utils:sweep:docs` | sonnet | any `.md` is in scope |
+
+**Standalone install** (no `bix-utils:sweep:*` agents available): launch `general-purpose` with
+the model above, and start each brief with "Read
+`${CLAUDE_SKILL_DIR}/references/agents/<lens>.md` and follow it as your instructions", where
+`<lens>` is the last part of the `subagent_type`.
 
 - **Partition by size.** Up to ~5 files and ~400 changed lines: one agent per lens. Larger: split
   each lens by module so no agent gets more than that.
 - **Brief** each agent with: the scope, its partition's file list and diff command, the rule-file
-  paths, the shared-helper list if any, user-chosen designs to keep, findings already known, the
+  paths, the requirement (the user's request, plan and decisions from the conversation, else the
+  commit message or tracker entry), the shared-helper list if any, user-chosen designs to keep, findings already known, the
   path to `references/symbol-search.md` in this skill's directory, and the no-secrets rule. Agents
   read the full files themselves.
 

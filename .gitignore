@@ -12,3 +12,6 @@ Thumbs.db
 # Claude Code local state
 .claude/
 CLAUDE.md
+
+# Build output
+dist/

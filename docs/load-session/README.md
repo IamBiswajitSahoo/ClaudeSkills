@@ -38,7 +38,7 @@ If you don't name your sessions, no problem — the browse view shows the first 
 
 | Mode | How It Works | Cost |
 | ---- | ------------ | ---- |
-| **Compact** | Summarizes the session using an AI template, injects the summary | Uses tokens (runs `claude --resume` under the hood) |
+| **Compact** | Summarizes the session using an AI template, injects the summary | Uses tokens (a Sonnet sub-agent summarizes the transcript) |
 | **Full** | Parses the raw session file, extracts the conversation as-is | Free (reads from disk) |
 
 The skill shows you estimated token usage before loading and warns if a full transcript would consume a large portion of your context window.
